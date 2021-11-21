@@ -1,5 +1,6 @@
 table, th, td {
     border: 1px solid black;
+    border-collapse:collapse;
   }
 
   th,
@@ -8,6 +9,7 @@ table, th, td {
   width: 40px;
   height: 40px;
   overflow: hidden;
+  padding: 7px;
 }
 
 .pawn {
@@ -15,8 +17,7 @@ table, th, td {
     width: 100%;
     height: 100%;
     border: none;
-    background-color: white;
-    padding: 0px 0px;
+    background-color: transparent;
     cursor: pointer;
     text-align: center;
   }
