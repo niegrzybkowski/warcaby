@@ -8,6 +8,10 @@ let board_state = {
     dom_object
 };
 
+get_board_state_field = function(i, j) {
+    return board_state.fields[i + "_" +j];
+}
+
 window.onload = function (){
     initialize_pawns();
     color_board();
