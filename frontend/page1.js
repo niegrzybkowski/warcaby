@@ -168,7 +168,7 @@ button_clicked = function(){
             let second_id = this.id;
             var moved = make_move(chosen_id, second_id);
             if(moved==false){
-                beat();
+                beat(chosen_id, second_id);
             }
             chosen=false;
         } 
@@ -205,7 +205,9 @@ make_move = function(first_id, second_id){
 
 }
 
-beat = function(){
+beat = function(first_id, second_id){
+    let color;
+    color = positions[first_id];
     if(color == 'w'){
         if(second_id == +first_id-20-2 && positions[+first_id-10-1]=="b"){
             let pawn1 = document.getElementById(first_id);
@@ -216,7 +218,7 @@ beat = function(){
             pawn_beated.style.backgroundColor = "transparent";
             positions[first_id] = null;
             positions[second_id] = "w";
-            positions[pawn_beated] = null;
+            positions[+first_id-10-1] = null;
             
         }
         if(second_id == +first_id-20+2 && positions[+first_id-10+1]=="b"){
@@ -228,7 +230,7 @@ beat = function(){
             pawn_beated.style.backgroundColor = "transparent";
             positions[first_id] = null;
             positions[second_id] = "w";
-            positions[pawn_beated] = null;
+            positions[+first_id-10+1] = null;
         }
         if(second_id == +first_id+20-2 && positions[+first_id+10-1]=="b"){
             let pawn1 = document.getElementById(first_id);
@@ -239,7 +241,7 @@ beat = function(){
             pawn_beated.style.backgroundColor = "transparent";
             positions[first_id] = null;
             positions[second_id] = "w";
-            positions[pawn_beated] = null;
+            positions[+first_id+10-1] = null;
         }
         if(second_id == +first_id+20+2&& positions[+first_id+10+1]=="b"){
             let pawn1 = document.getElementById(first_id);
@@ -250,7 +252,7 @@ beat = function(){
             pawn_beated.style.backgroundColor = "transparent";
             positions[first_id] = null;
             positions[second_id] = "w";
-            positions[pawn_beated] = null;
+            positions[+first_id+10+1] = null;
         }
 
 
