@@ -1,6 +1,7 @@
 let positions = new Array(100);
 let chosen = false;
 let chosen_id = new Number;
+let last_move = "b";
 
 let board_state = {
     configuration: {},
@@ -254,8 +255,52 @@ beat = function(first_id, second_id){
             positions[second_id] = "w";
             positions[+first_id+10+1] = null;
         }
-
-
     }
-
+    if(color == 'b'){
+        if(second_id == +first_id-20-2 && positions[+first_id-10-1]=="w"){
+            let pawn1 = document.getElementById(first_id);
+            let pawn2 = document.getElementById(second_id);
+            let pawn_beated = document.getElementById(+first_id-10-1);
+            pawn1.style.backgroundColor = "transparent";
+            pawn2.style.backgroundColor = "black";
+            pawn_beated.style.backgroundColor = "transparent";
+            positions[first_id] = null;
+            positions[second_id] = "b";
+            positions[+first_id-10-1] = null;
+            
+        }
+        if(second_id == +first_id-20+2 && positions[+first_id-10+1]=="w"){
+            let pawn1 = document.getElementById(first_id);
+            let pawn2 = document.getElementById(second_id);
+            let pawn_beated = document.getElementById(+first_id-10+1);
+            pawn1.style.backgroundColor = "transparent";
+            pawn2.style.backgroundColor = "black";
+            pawn_beated.style.backgroundColor = "transparent";
+            positions[first_id] = null;
+            positions[second_id] = "b";
+            positions[+first_id-10+1] = null;
+        }
+        if(second_id == +first_id+20-2 && positions[+first_id+10-1]=="w"){
+            let pawn1 = document.getElementById(first_id);
+            let pawn2 = document.getElementById(second_id);
+            let pawn_beated = document.getElementById(+first_id+10-1);
+            pawn1.style.backgroundColor = "transparent";
+            pawn2.style.backgroundColor = "black";
+            pawn_beated.style.backgroundColor = "transparent";
+            positions[first_id] = null;
+            positions[second_id] = "b";
+            positions[+first_id+10-1] = null;
+        }
+        if(second_id == +first_id+20+2&& positions[+first_id+10+1]=="w"){
+            let pawn1 = document.getElementById(first_id);
+            let pawn2 = document.getElementById(second_id);
+            let pawn_beated = document.getElementById(+first_id+10+1);
+            pawn1.style.backgroundColor = "transparent";
+            pawn2.style.backgroundColor = "black";
+            pawn_beated.style.backgroundColor = "transparent";
+            positions[first_id] = null;
+            positions[second_id] = "b";
+            positions[+first_id+10+1] = null;
+        }
+    }
 }
