@@ -122,7 +122,7 @@ button_clicked = function(){
         }
         else{
             let second_id = this.id;
-            make_move(chosen_id, second_id);
+            var moved = make_move(chosen_id, second_id);
             chosen=false;
         } 
     }
@@ -138,6 +138,7 @@ make_move = function(first_id, second_id){
             pawn2.style.backgroundColor = "yellow";
             positions[first_id] = null;
             positions[second_id] = "w";
+            return true;
         }
     }
     if(color == 'b'){
@@ -148,8 +149,10 @@ make_move = function(first_id, second_id){
             pawn2.style.backgroundColor = "black";
             positions[first_id] = null;
             positions[second_id] = "b";
+            return true
         }
 
     }
+    return false;
 
 }
