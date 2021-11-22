@@ -16,6 +16,23 @@ initialize_board_configuration = function(size, starting_rows) {
     board_state.board_configuration = board_configuration;
 }
 
+initialize_board_fields = function() {
+    let size = board_state.board_configuration.size;
+    let fields = {};
+
+    for (let i = 1; i <= size; i++) {
+        for (let j = 1; j <=size; j++) {
+            let color = (i+j)%2 == 1 ? "black" : "white";
+
+            fields[i + "_" + j] = {
+                "type": color,
+                "pawn": null
+            }
+        }
+    }
+    board_state.fields = fields;
+}
+
 color_board = function(){
     for(let i = 0; i < 100; i ++){
         let j;
