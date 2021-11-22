@@ -3,9 +3,9 @@ let chosen = false;
 let chosen_id = new Number;
 
 let board_state = {
-    configuration,
+    configuration: {},
     fields: {},
-    dom_object
+    dom_object: {}
 };
 
 get_board_state_field = function(i, j) {
