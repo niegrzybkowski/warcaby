@@ -2,8 +2,8 @@ let positions = new Array(100);
 
 window.onload = function (){
     initialize_pawns();
-    color_board()
-    console.log(positions);
+    color_board();
+    make_buttons_clicable();
 }
 
 color_board = function(){
@@ -62,4 +62,23 @@ initialize_pawns = function(){
         
     }
     
+}
+
+make_buttons_clicable = function(){
+    for(let i = 0; i < 100; i = i + 1){
+        let j;
+        if(i<10){
+            j = '0' + i;
+        }
+        else{
+            j = i.toString();
+        }
+        let pawn = document.getElementById(j);
+        pawn.onclick = button_clicked;
+    }
+}
+
+button_clicked = function(){
+    let id = this.id;
+    console.log(id)
 }
