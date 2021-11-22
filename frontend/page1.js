@@ -123,6 +123,9 @@ button_clicked = function(){
         else{
             let second_id = this.id;
             var moved = make_move(chosen_id, second_id);
+            if(moved==false){
+                beat();
+            }
             chosen=false;
         } 
     }
@@ -154,5 +157,10 @@ make_move = function(first_id, second_id){
 
     }
     return false;
+
+}
+
+beat = function(){
+    
 
 }
