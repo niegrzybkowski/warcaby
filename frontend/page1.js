@@ -1,6 +1,19 @@
+let board_state = {};
+
 window.onload = function (){
     initialize_pawns();
     color_board()
+}
+
+initialize_board_configuration = function(size, starting_rows) {
+    if (size <= 2 * starting_rows) {
+        throw Error("Board size too small");
+    }
+    let board_configuration = {
+        "size": size,
+        "starting_rows": starting_rows
+    };
+    board_state.board_configuration = board_configuration;
 }
 
 color_board = function(){
