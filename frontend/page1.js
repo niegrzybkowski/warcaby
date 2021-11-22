@@ -1,8 +1,11 @@
-let board_state = {};
+let positions = new Array(100);
+let chosen = false;
+let chosen_id = new Number;
 
 window.onload = function (){
     initialize_pawns();
-    color_board()
+    color_board();
+    make_buttons_clicable();
 }
 
 initialize_board_configuration = function(size, starting_rows) {
@@ -71,6 +74,7 @@ initialize_pawns = function(){
         let pawn = document.getElementById(j);
         if((firstchar+secondchar)%2==1){
             pawn.style.backgroundColor = "black";
+            positions[i] = "b";
         }
 
     }
@@ -82,9 +86,70 @@ initialize_pawns = function(){
         let pawn = document.getElementById(j);
         if((firstchar+secondchar)%2==1){
             pawn.style.backgroundColor = "yellow";
+            positions[i] = "w";
         }
 
         
     }
     
+}
+
+make_buttons_clicable = function(){
+    for(let i = 0; i < 100; i = i + 1){
+        let j;
+        if(i<10){
+            j = '0' + i;
+        }
+        else{
+            j = i.toString();
+        }
+        let pawn = document.getElementById(j);
+        pawn.onclick = button_clicked;
+    }
+}
+
+button_clicked = function(){
+    if(chosen==false){
+        if(positions[this.id] == "w" || positions[this.id] == "b"){
+            chosen=true;
+            chosen_id=this.id;
+        }
+    }
+    else{
+        if(positions[this.id] == "w" || positions[this.id] == "b"){
+            chosen=true;
+            chosen_id=this.id;
+        }
+        else{
+            let second_id = this.id;
+            make_move(chosen_id, second_id);
+            chosen=false;
+        } 
+    }
+}
+
+make_move = function(first_id, second_id){
+    let color = positions[first_id];
+    if(color == 'w'){
+        if(second_id == +first_id-10-1 || second_id == +first_id-10+1){
+            let pawn1 = document.getElementById(first_id);
+            let pawn2 = document.getElementById(second_id);
+            pawn1.style.backgroundColor = "transparent";
+            pawn2.style.backgroundColor = "yellow";
+            positions[first_id] = null;
+            positions[second_id] = "w";
+        }
+    }
+    if(color == 'b'){
+        if(second_id == +first_id +10-1 || second_id == +first_id+10+1){
+            let pawn1 = document.getElementById(first_id);
+            let pawn2 = document.getElementById(second_id);
+            pawn1.style.backgroundColor = "transparent";
+            pawn2.style.backgroundColor = "black";
+            positions[first_id] = null;
+            positions[second_id] = "b";
+        }
+
+    }
+
 }
