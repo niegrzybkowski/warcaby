@@ -1,6 +1,9 @@
+let positions = new Array(100);
+
 window.onload = function (){
     initialize_pawns();
     color_board()
+    console.log(positions);
 }
 
 color_board = function(){
@@ -41,6 +44,7 @@ initialize_pawns = function(){
         let pawn = document.getElementById(j);
         if((firstchar+secondchar)%2==1){
             pawn.style.backgroundColor = "black";
+            positions[i] = "b";
         }
 
     }
@@ -52,6 +56,7 @@ initialize_pawns = function(){
         let pawn = document.getElementById(j);
         if((firstchar+secondchar)%2==1){
             pawn.style.backgroundColor = "yellow";
+            positions[i] = "w";
         }
 
         
