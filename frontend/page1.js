@@ -132,7 +132,8 @@ button_clicked = function(){
 }
 
 make_move = function(first_id, second_id){
-    let color = positions[first_id];
+    let color;
+    color = positions[first_id];
     if(color == 'w'){
         if(second_id == +first_id-10-1 || second_id == +first_id-10+1){
             let pawn1 = document.getElementById(first_id);
@@ -152,7 +153,7 @@ make_move = function(first_id, second_id){
             pawn2.style.backgroundColor = "black";
             positions[first_id] = null;
             positions[second_id] = "b";
-            return true
+            return true;
         }
 
     }
@@ -161,6 +162,54 @@ make_move = function(first_id, second_id){
 }
 
 beat = function(){
-    
+    if(color == 'w'){
+        if(second_id == +first_id-20-2 && positions[+first_id-10-1]=="b"){
+            let pawn1 = document.getElementById(first_id);
+            let pawn2 = document.getElementById(second_id);
+            let pawn_beated = document.getElementById(+first_id-10-1);
+            pawn1.style.backgroundColor = "transparent";
+            pawn2.style.backgroundColor = "yellow";
+            pawn_beated.style.backgroundColor = "transparent";
+            positions[first_id] = null;
+            positions[second_id] = "w";
+            positions[pawn_beated] = null;
+            
+        }
+        if(second_id == +first_id-20+2 && positions[+first_id-10+1]=="b"){
+            let pawn1 = document.getElementById(first_id);
+            let pawn2 = document.getElementById(second_id);
+            let pawn_beated = document.getElementById(+first_id-10+1);
+            pawn1.style.backgroundColor = "transparent";
+            pawn2.style.backgroundColor = "yellow";
+            pawn_beated.style.backgroundColor = "transparent";
+            positions[first_id] = null;
+            positions[second_id] = "w";
+            positions[pawn_beated] = null;
+        }
+        if(second_id == +first_id+20-2 && positions[+first_id+10-1]=="b"){
+            let pawn1 = document.getElementById(first_id);
+            let pawn2 = document.getElementById(second_id);
+            let pawn_beated = document.getElementById(+first_id+10-1);
+            pawn1.style.backgroundColor = "transparent";
+            pawn2.style.backgroundColor = "yellow";
+            pawn_beated.style.backgroundColor = "transparent";
+            positions[first_id] = null;
+            positions[second_id] = "w";
+            positions[pawn_beated] = null;
+        }
+        if(second_id == +first_id+20+2&& positions[+first_id+10+1]=="b"){
+            let pawn1 = document.getElementById(first_id);
+            let pawn2 = document.getElementById(second_id);
+            let pawn_beated = document.getElementById(+first_id+10+1);
+            pawn1.style.backgroundColor = "transparent";
+            pawn2.style.backgroundColor = "yellow";
+            pawn_beated.style.backgroundColor = "transparent";
+            positions[first_id] = null;
+            positions[second_id] = "w";
+            positions[pawn_beated] = null;
+        }
+
+
+    }
 
 }
