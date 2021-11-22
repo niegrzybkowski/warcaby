@@ -22,6 +22,7 @@ initialize_board_state = function() {
     board_state.dom_object = document.getElementById("plansza");
     initialize_board_configuration(10, 4);
     initialize_board_fields();
+    initialize_board_pawns();
 }
 
 initialize_board_configuration = function(size, starting_rows) {
@@ -51,6 +52,32 @@ initialize_board_fields = function() {
         }
     }
     board_state.fields = fields;
+}
+
+initialize_board_pawns = function () {
+    let size = board_state.configuration.size;
+    let starting_rows = board_state.configuration.starting_rows;
+    for (let row = 1; row <= starting_rows; row++) { 
+        for (let column = 1; column <= size; column++) {
+            let field = get_board_state_field(row, column);
+            if (field.type == "black"){
+                field.pawn = {
+                    "type": "black",
+                    "queen": false
+                }
+            }
+        }
+
+        for (let column = 1; column <= size; column++) {
+            let field = get_board_state_field(row, column);
+            if (field.type == "black"){
+                field.pawn = {
+                    "type": "white",
+                    "queen": false
+                }
+            }
+        }
+    }
 }
 
 color_board = function(){
