@@ -42,6 +42,7 @@ initialize_board_fields = function() {
             fields[i + "_" + j] = {
                 "type": color,
                 "pawn": null
+                // TODO: add dom reference initializer
             }
         }
     }
