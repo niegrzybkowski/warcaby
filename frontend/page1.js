@@ -2,10 +2,22 @@ let positions = new Array(100);
 let chosen = false;
 let chosen_id = new Number;
 
+let board_state = {
+    configuration,
+    fields: {},
+    dom_object
+};
+
 window.onload = function (){
     initialize_pawns();
     color_board();
     make_buttons_clicable();
+}
+
+initialize_board_state = function() {
+    board_state.dom_object = document.getElementById("plansza");
+    initialize_board_configuration(10, 4);
+    initialize_board_fields();
 }
 
 initialize_board_configuration = function(size, starting_rows) {
@@ -16,11 +28,11 @@ initialize_board_configuration = function(size, starting_rows) {
         "size": size,
         "starting_rows": starting_rows
     };
-    board_state.board_configuration = board_configuration;
+    board_state.configuration = board_configuration;
 }
 
 initialize_board_fields = function() {
-    let size = board_state.board_configuration.size;
+    let size = board_state.configuration.size;
     let fields = {};
 
     for (let i = 1; i <= size; i++) {
