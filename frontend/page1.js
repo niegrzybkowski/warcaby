@@ -155,7 +155,7 @@ make_buttons_clicable = function(){
 
 button_clicked = function(){
     if(chosen==false){
-        if(positions[this.id] == "w" || positions[this.id] == "b"){
+        if((positions[this.id] == "w" || positions[this.id] == "b") && last_move != positions[this.id]){
             chosen=true;
             chosen_id=this.id;
         }
@@ -187,6 +187,7 @@ make_move = function(first_id, second_id){
             pawn2.style.backgroundColor = "yellow";
             positions[first_id] = null;
             positions[second_id] = "w";
+            last_move = "w";
             return true;
         }
     }
@@ -198,6 +199,7 @@ make_move = function(first_id, second_id){
             pawn2.style.backgroundColor = "black";
             positions[first_id] = null;
             positions[second_id] = "b";
+            last_move = "b";
             return true;
         }
 
@@ -220,7 +222,7 @@ beat = function(first_id, second_id){
             positions[first_id] = null;
             positions[second_id] = "w";
             positions[+first_id-10-1] = null;
-            
+            last_move = "w";
         }
         if(second_id == +first_id-20+2 && positions[+first_id-10+1]=="b"){
             let pawn1 = document.getElementById(first_id);
@@ -232,6 +234,7 @@ beat = function(first_id, second_id){
             positions[first_id] = null;
             positions[second_id] = "w";
             positions[+first_id-10+1] = null;
+            last_move = "w";
         }
         if(second_id == +first_id+20-2 && positions[+first_id+10-1]=="b"){
             let pawn1 = document.getElementById(first_id);
@@ -243,6 +246,7 @@ beat = function(first_id, second_id){
             positions[first_id] = null;
             positions[second_id] = "w";
             positions[+first_id+10-1] = null;
+            last_move = "w";
         }
         if(second_id == +first_id+20+2&& positions[+first_id+10+1]=="b"){
             let pawn1 = document.getElementById(first_id);
@@ -254,6 +258,7 @@ beat = function(first_id, second_id){
             positions[first_id] = null;
             positions[second_id] = "w";
             positions[+first_id+10+1] = null;
+            last_move = "w";
         }
     }
     if(color == 'b'){
@@ -267,7 +272,7 @@ beat = function(first_id, second_id){
             positions[first_id] = null;
             positions[second_id] = "b";
             positions[+first_id-10-1] = null;
-            
+            last_move = "b";
         }
         if(second_id == +first_id-20+2 && positions[+first_id-10+1]=="w"){
             let pawn1 = document.getElementById(first_id);
@@ -279,6 +284,7 @@ beat = function(first_id, second_id){
             positions[first_id] = null;
             positions[second_id] = "b";
             positions[+first_id-10+1] = null;
+            last_move = "b";
         }
         if(second_id == +first_id+20-2 && positions[+first_id+10-1]=="w"){
             let pawn1 = document.getElementById(first_id);
@@ -290,6 +296,7 @@ beat = function(first_id, second_id){
             positions[first_id] = null;
             positions[second_id] = "b";
             positions[+first_id+10-1] = null;
+            last_move = "b";
         }
         if(second_id == +first_id+20+2&& positions[+first_id+10+1]=="w"){
             let pawn1 = document.getElementById(first_id);
@@ -301,6 +308,7 @@ beat = function(first_id, second_id){
             positions[first_id] = null;
             positions[second_id] = "b";
             positions[+first_id+10+1] = null;
+            last_move = "b";
         }
     }
 }
