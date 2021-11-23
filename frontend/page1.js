@@ -2,6 +2,8 @@ let positions = new Array(100);
 let chosen = false;
 let chosen_id = new Number;
 let last_move = "b";
+const queens_white = ["01", "03", "05", "07", "09"];
+const queens_black = ["91", "93", "95", "97", "99"];
 
 let board_state = {
     configuration: {},
@@ -155,13 +157,13 @@ make_buttons_clicable = function(){
 
 button_clicked = function(){
     if(chosen==false){
-        if((positions[this.id] == "w" || positions[this.id] == "b") && last_move != positions[this.id]){
+        if((positions[+this.id] == "w" || positions[+this.id] == "b") && last_move != positions[+this.id]){
             chosen=true;
             chosen_id=this.id;
         }
     }
     else{
-        if(positions[this.id] == "w" || positions[this.id] == "b"){
+        if(positions[+this.id] == "w" || positions[+this.id] == "b"){
             chosen=true;
             chosen_id=this.id;
         }
@@ -172,21 +174,36 @@ button_clicked = function(){
                 beat(chosen_id, second_id);
             }
             chosen=false;
+            //damka
+            console.log(chosen_id)
+            console.log(second_id)
+            if(positions[+second_id] == "w" && queens_white.includes(second_id)){
+                let pawn = document.getElementById(second_id);
+                pawn.innerHTML = "Q";
+                positions[+chosen_id] = "wq";
+            }
+            if(positions[+second_id] == "b" && queens_black.includes(second_id)){
+                let pawn = document.getElementById(second_id);
+                pawn.innerHTML = "Q";
+                positions[+chosen_id] = "bq";
+            }
+
         } 
     }
+
 }
 
 make_move = function(first_id, second_id){
     let color;
-    color = positions[first_id];
+    color = positions[+first_id];
     if(color == 'w'){
         if(second_id == +first_id-10-1 || second_id == +first_id-10+1){
             let pawn1 = document.getElementById(first_id);
             let pawn2 = document.getElementById(second_id);
             pawn1.style.backgroundColor = "transparent";
             pawn2.style.backgroundColor = "yellow";
-            positions[first_id] = null;
-            positions[second_id] = "w";
+            positions[+first_id] = null;
+            positions[+second_id] = "w";
             last_move = "w";
             return true;
         }
@@ -197,8 +214,8 @@ make_move = function(first_id, second_id){
             let pawn2 = document.getElementById(second_id);
             pawn1.style.backgroundColor = "transparent";
             pawn2.style.backgroundColor = "black";
-            positions[first_id] = null;
-            positions[second_id] = "b";
+            positions[+first_id] = null;
+            positions[+second_id] = "b";
             last_move = "b";
             return true;
         }
@@ -210,7 +227,7 @@ make_move = function(first_id, second_id){
 
 beat = function(first_id, second_id){
     let color;
-    color = positions[first_id];
+    color = positions[+first_id];
     if(color == 'w'){
         if(second_id == +first_id-20-2 && positions[+first_id-10-1]=="b"){
             let pawn1 = document.getElementById(first_id);
@@ -219,8 +236,8 @@ beat = function(first_id, second_id){
             pawn1.style.backgroundColor = "transparent";
             pawn2.style.backgroundColor = "yellow";
             pawn_beated.style.backgroundColor = "transparent";
-            positions[first_id] = null;
-            positions[second_id] = "w";
+            positions[+first_id] = null;
+            positions[+second_id] = "w";
             positions[+first_id-10-1] = null;
             last_move = "w";
         }
@@ -231,8 +248,8 @@ beat = function(first_id, second_id){
             pawn1.style.backgroundColor = "transparent";
             pawn2.style.backgroundColor = "yellow";
             pawn_beated.style.backgroundColor = "transparent";
-            positions[first_id] = null;
-            positions[second_id] = "w";
+            positions[+first_id] = null;
+            positions[+second_id] = "w";
             positions[+first_id-10+1] = null;
             last_move = "w";
         }
@@ -243,8 +260,8 @@ beat = function(first_id, second_id){
             pawn1.style.backgroundColor = "transparent";
             pawn2.style.backgroundColor = "yellow";
             pawn_beated.style.backgroundColor = "transparent";
-            positions[first_id] = null;
-            positions[second_id] = "w";
+            positions[+first_id] = null;
+            positions[+second_id] = "w";
             positions[+first_id+10-1] = null;
             last_move = "w";
         }
@@ -255,8 +272,8 @@ beat = function(first_id, second_id){
             pawn1.style.backgroundColor = "transparent";
             pawn2.style.backgroundColor = "yellow";
             pawn_beated.style.backgroundColor = "transparent";
-            positions[first_id] = null;
-            positions[second_id] = "w";
+            positions[+first_id] = null;
+            positions[+second_id] = "w";
             positions[+first_id+10+1] = null;
             last_move = "w";
         }
@@ -269,8 +286,8 @@ beat = function(first_id, second_id){
             pawn1.style.backgroundColor = "transparent";
             pawn2.style.backgroundColor = "black";
             pawn_beated.style.backgroundColor = "transparent";
-            positions[first_id] = null;
-            positions[second_id] = "b";
+            positions[+first_id] = null;
+            positions[+second_id] = "b";
             positions[+first_id-10-1] = null;
             last_move = "b";
         }
@@ -281,8 +298,8 @@ beat = function(first_id, second_id){
             pawn1.style.backgroundColor = "transparent";
             pawn2.style.backgroundColor = "black";
             pawn_beated.style.backgroundColor = "transparent";
-            positions[first_id] = null;
-            positions[second_id] = "b";
+            positions[+first_id] = null;
+            positions[+second_id] = "b";
             positions[+first_id-10+1] = null;
             last_move = "b";
         }
@@ -293,8 +310,8 @@ beat = function(first_id, second_id){
             pawn1.style.backgroundColor = "transparent";
             pawn2.style.backgroundColor = "black";
             pawn_beated.style.backgroundColor = "transparent";
-            positions[first_id] = null;
-            positions[second_id] = "b";
+            positions[+first_id] = null;
+            positions[+second_id] = "b";
             positions[+first_id+10-1] = null;
             last_move = "b";
         }
@@ -305,8 +322,8 @@ beat = function(first_id, second_id){
             pawn1.style.backgroundColor = "transparent";
             pawn2.style.backgroundColor = "black";
             pawn_beated.style.backgroundColor = "transparent";
-            positions[first_id] = null;
-            positions[second_id] = "b";
+            positions[+first_id] = null;
+            positions[+second_id] = "b";
             positions[+first_id+10+1] = null;
             last_move = "b";
         }
