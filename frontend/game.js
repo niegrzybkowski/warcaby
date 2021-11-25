@@ -14,7 +14,9 @@ function test () {
         br
     );
     br.render();
-    bc.install_select_callbacks();
+    bc.install_all_select_callbacks();
+
+    return [bs, es, br, bc];
 }
 
 class BoardConfiguration {
@@ -202,6 +204,7 @@ class BoardRenderer {
     /** @type {Array.<HTMLElement>} */ rows = [];
     /** @type {Object.<string, Node>} */ cells = {};
     /** @type {Object.<string, Node>} */ pawns = {};
+    /** @type {Object<string, Node>} */ legal_move_indicators = {};
 
     constructor(persistent_board_state, ephemeral_board_state, container) {
         this.persistent_board_state = persistent_board_state;
@@ -228,6 +231,7 @@ class BoardRenderer {
         this.rows = [];
         this.cells = {};
         this.pawns = {};
+        this.legal_move_indicators = {};
     }
 
     render_info () {
@@ -344,6 +348,7 @@ class BoardRenderer {
 
     render_ephemeral () {
         this.render_selected();
+        this.render_legal_moves();
     }
 
     render_selected () {
@@ -353,6 +358,15 @@ class BoardRenderer {
             let target_color = this.persistent_board_state.fields[position].pawn.color;
 
             targeted_field_dom.setAttribute("class", "pawn-" + target_color + "-selected")            
+        }
+    }
+
+    render_legal_moves () {
+        for (let  [legal_move_position, _value] of Object.entries(this.ephemeral_board_state.legal_moves)) {
+            let legal_move_indicator = document.createElement("button");
+            legal_move_indicator.setAttribute("class", "possible-move");
+
+            this.cells[legal_move_position].appendChild(legal_move_indicator);
         }
     }
 
@@ -368,7 +382,7 @@ class BoardRenderer {
      * Callback installation functions
      */
 
-    install_callback(at_row, at_column, callback) {
+    install_select_callback(at_row, at_column, callback) {
         if (this.pawns[at_row + "_" + at_column]) {
             this.pawns[at_row + "_" + at_column].onclick = callback;
         } else {
@@ -392,27 +406,86 @@ class BoardController {
         this.board_renderer = board_renderer;
     }
 
-    install_select_callbacks() {
+    install_all_select_callbacks() {
         let controller = this;
         this.persistent_board_state.for_each_field((row_idx, column_idx, field) => {
             if (field.pawn) {
-                this.board_renderer.install_callback(row_idx, column_idx, () => {
+                this.board_renderer.install_select_callback(row_idx, column_idx, () => {
                     controller.select_pawn(row_idx, column_idx);
                     controller.board_renderer.render();
-                    controller.install_select_callbacks();
+                    controller.install_all_select_callbacks();
                 });
             }
         });
     }
 
     select_pawn(row_idx, column_idx) {
-        let position = row_idx + "_" + column_idx
+        let position = row_idx + "_" + column_idx;
+
+        if (this.persistent_board_state.current_move != this.persistent_board_state.fields[position].pawn.color) {
+            return;
+        }
+
         if (this.ephemeral_board_state.selected_pawn == position) {
             this.ephemeral_board_state.selected_pawn = null;
             this.ephemeral_board_state.clear();
         }
         else {
             this.ephemeral_board_state.selected_pawn = position; 
+            this.find_moves();
         }
+    }
+
+    is_field_empty_and_legal (row_idx, column_idx) {
+        if (this.persistent_board_state.fields[row_idx + "_" + column_idx]) {
+            if (this.persistent_board_state.fields[row_idx + "_" + column_idx].pawn)
+                return false;
+            else 
+                return true;
+        }
+        else {
+            return false;
+        }
+    }
+
+    find_moves () {
+        let [row_idx, column_idx] = this.ephemeral_board_state.selected_pawn.split("_", 2);
+        row_idx = Number(row_idx);
+        column_idx = Number(column_idx);
+        
+        this.find_simple_moves(row_idx, column_idx);
+        this.find_queen_moves();
+        this.find_kill_moves();
+        this.find_queen_kill_moves();
+    }
+
+    check_and_set (row_idx, column_idx) {
+        if (this.is_field_empty_and_legal(row_idx, column_idx)) {
+            this.ephemeral_board_state.legal_moves[row_idx + "_" + column_idx] = true;
+        }
+    }
+
+    find_simple_moves (row_idx, column_idx) {
+        if (this.persistent_board_state.current_move == "white") {
+            this.check_and_set(row_idx - 1, column_idx + 1)
+            this.check_and_set(row_idx - 1, column_idx - 1)
+        } else if (this.persistent_board_state.current_move == "black"){
+            this.check_and_set(row_idx + 1, column_idx + 1)
+            this.check_and_set(row_idx + 1, column_idx - 1)
+        } else {
+            console.error("Current move is not eithe white or black!")
+        }
+    }
+
+    find_queen_moves () {
+        
+    }
+
+    find_kill_moves() {
+
+    }
+
+    find_queen_kill_moves() {
+
     }
 }

@@ -80,3 +80,16 @@ th, td {
   cursor: pointer;
   text-align: center;
 }
+
+.possible-move {
+  border-radius: 50%;
+  display: block;
+
+  margin: 25%;
+  width: 50%;
+  height: 50%;
+
+  background-color: blue;
+  cursor: pointer;
+  text-align: center;
+}
