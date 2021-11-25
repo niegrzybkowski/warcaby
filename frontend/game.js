@@ -1,8 +1,17 @@
 function test () {
     let bs = new PersistentBoardState(true);
+    let es = new EphemeralBoardState();
+    es.selected_pawn = "6_1";
+
     let br = new BoardRenderer(
         bs,
+        es,
         document.getElementById("game_board_container")
+    );
+    let bc = new BoardController(
+        bs,
+        es,
+        br
     );
     br.render();
 }
@@ -164,9 +173,19 @@ class EphemeralBoardState {
     /** @type {Object.<string, null>} */ selectable_pawns;
     /** @type {string} */ selected_pawn;
     /** @type {Object.<string, null} */ legal_moves;
+    
+    constructor () {
+        this.selectable_pawns = {};
+        this.selected_pawn = null;
+        this.legal_moves = null;
+    }
 }
 
 class BoardRenderer {
+    /**
+     * Render state in DOM and control it
+     */
+
     /** @type {PersistentBoardState} */ persistent_board_state;
     /** @type {EphemeralBoardState} */ ephemeral_board_state;
 
@@ -175,6 +194,7 @@ class BoardRenderer {
     /** @type {HTMLElement} */ table;
     /** @type {Array.<HTMLElement>} */ rows = [];
     /** @type {Object.<string, Node>} */ cells = {};
+    /** @type {Object.<string, Node>} */ pawns = {};
 
     constructor(persistent_board_state, ephemeral_board_state, container) {
         this.persistent_board_state = persistent_board_state;
@@ -189,6 +209,9 @@ class BoardRenderer {
         this.clear();
         this.render_info();
         this.render_table();
+        this.render_ephemeral();
+
+        console.log("Done Rendering");
     }
 
     clear () {
@@ -302,10 +325,23 @@ class BoardRenderer {
                 }
 
                 this.cells[row_idx + "_" + column_idx].appendChild(pawn_button);
+                this.pawns[row_idx + "_" + column_idx] = pawn_button;
             }
         });
+    }
 
-        console.log("Done Rendering");
+    render_ephemeral () {
+        this.render_selected();
+    }
+
+    render_selected () {
+        let position = this.ephemeral_board_state.selected_pawn;
+        if (position) {
+            let targeted_field_dom = this.pawns[position];
+            let target_color = this.persistent_board_state.fields[position].pawn.color;
+
+            targeted_field_dom.setAttribute("class", "pawn-" + target_color + "-selected")            
+        }
     }
 
     /**
@@ -315,10 +351,32 @@ class BoardRenderer {
     update_last_move () {
 
     }
+
+    /**
+     * Callback installation functions
+     */
+
+    install_callback(at_row, at_column, action, callback) {
+
+    }
 }
 
 class BoardController {
     /**
      * Game logic
      */
+
+    /** @type {PersistentBoardState} */ persistent_board_state;
+    /** @type {EphemeralBoardState} */ ephemeral_board_state;
+    /** @type {BoardRenderer} */ board_renderer;
+
+    constructor (persistent_board_state, ephemeral_board_state, board_renderer) {
+        this.persistent_board_state = persistent_board_state;
+        this.ephemeral_board_state = ephemeral_board_state;
+        this.board_renderer = board_renderer;
+    }
+
+    select_pawn() {
+
+    }
 }
