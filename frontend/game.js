@@ -427,11 +427,11 @@ class BoardController {
         }
 
         if (this.ephemeral_board_state.selected_pawn == position) {
-            this.ephemeral_board_state.selected_pawn = null;
             this.ephemeral_board_state.clear();
         }
         else {
-            this.ephemeral_board_state.selected_pawn = position; 
+            this.ephemeral_board_state.clear();
+            this.ephemeral_board_state.selected_pawn = position;
             this.find_moves();
         }
     }
