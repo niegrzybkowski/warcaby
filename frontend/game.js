@@ -168,19 +168,17 @@ class EphemeralBoardState {
 
 class BoardRenderer {
     /** @type {PersistentBoardState} */ persistent_board_state;
+    /** @type {EphemeralBoardState} */ ephemeral_board_state;
+
     /** @type {HTMLElement} */ container;
     /** @type {HTMLElement} */ game_information;
     /** @type {HTMLElement} */ table;
     /** @type {Array.<HTMLElement>} */ rows = [];
     /** @type {Object.<string, Node>} */ cells = {};
 
-    /**
-     * This class is responsible for representing the inner board state on the HTML document
-     * @param {PersistentBoardState} persistent_board_state;
-     * @param {HTMLElement} container;
-     */
-    constructor(persistent_board_state, container) {
+    constructor(persistent_board_state, ephemeral_board_state, container) {
         this.persistent_board_state = persistent_board_state;
+        this.ephemeral_board_state = ephemeral_board_state;
         this.container = container;
     }
 
