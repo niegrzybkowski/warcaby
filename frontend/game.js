@@ -14,6 +14,7 @@ function test () {
         br
     );
     br.render();
+    bc.install_select_callbacks();
 }
 
 class BoardConfiguration {
@@ -216,6 +217,11 @@ class BoardRenderer {
 
     clear () {
         this.container.innerHTML = "";
+        this.game_information = null;
+        this.table = null;
+        this.rows = [];
+        this.cells = {};
+        this.pawns = {};
     }
 
     render_info () {
@@ -356,8 +362,12 @@ class BoardRenderer {
      * Callback installation functions
      */
 
-    install_callback(at_row, at_column, action, callback) {
-
+    install_callback(at_row, at_column, callback) {
+        if (this.pawns[at_row + "_" + at_column]) {
+            this.pawns[at_row + "_" + at_column].onclick = callback;
+        } else {
+            console.error("Tried installing callback on non-existent pawn!");
+        }
     }
 }
 
@@ -376,7 +386,25 @@ class BoardController {
         this.board_renderer = board_renderer;
     }
 
-    select_pawn() {
+    install_select_callbacks() {
+        let controller = this;
+        this.persistent_board_state.for_each_field((row_idx, column_idx, field) => {
+            if (field.pawn) {
+                this.board_renderer.install_callback(row_idx, column_idx, () => {
+                    controller.select_pawn(row_idx + "_" + column_idx);
+                    controller.board_renderer.render();
+                    controller.install_select_callbacks();
+                });
+            }
+        });
+    }
 
+    select_pawn(position) {
+        if (this.ephemeral_board_state.selected_pawn == position) {
+            this.ephemeral_board_state.selected_pawn = null;
+        }
+        else {
+            this.ephemeral_board_state.selected_pawn = position; 
+        }
     }
 }
