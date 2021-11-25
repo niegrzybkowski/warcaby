@@ -178,7 +178,13 @@ class EphemeralBoardState {
     constructor () {
         this.selectable_pawns = {};
         this.selected_pawn = null;
-        this.legal_moves = null;
+        this.legal_moves = {};
+    }
+
+    clear () {
+        this.selectable_pawns = {};
+        this.selected_pawn = null;
+        this.legal_moves = {};
     }
 }
 
@@ -391,7 +397,7 @@ class BoardController {
         this.persistent_board_state.for_each_field((row_idx, column_idx, field) => {
             if (field.pawn) {
                 this.board_renderer.install_callback(row_idx, column_idx, () => {
-                    controller.select_pawn(row_idx + "_" + column_idx);
+                    controller.select_pawn(row_idx, column_idx);
                     controller.board_renderer.render();
                     controller.install_select_callbacks();
                 });
@@ -399,9 +405,11 @@ class BoardController {
         });
     }
 
-    select_pawn(position) {
+    select_pawn(row_idx, column_idx) {
+        let position = row_idx + "_" + column_idx
         if (this.ephemeral_board_state.selected_pawn == position) {
             this.ephemeral_board_state.selected_pawn = null;
+            this.ephemeral_board_state.clear();
         }
         else {
             this.ephemeral_board_state.selected_pawn = position; 
