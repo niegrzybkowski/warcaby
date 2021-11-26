@@ -19,6 +19,17 @@ function test () {
     return [bs, es, br, bc];
 }
 
+function rowcol_to_position (row_idx, column_idx) {
+    return row_idx + "_" + column_idx;
+}
+
+function position_to_rowcol (position) {
+    let [row_idx, column_idx] = position.split("_", 2);
+    row_idx = Number(row_idx);
+    column_idx = Number(column_idx);
+    return [row_idx, column_idx];
+}
+
 class BoardConfiguration {
     /** @type {number} */
     size;
@@ -102,6 +113,16 @@ class PersistentBoardState {
                 callable(row_idx, column_idx, this.fields[row_idx + "_" + column_idx]);
             }
         }
+    }
+
+    get_pawn_at (row_idx, column_idx) {
+        if (this.fields[rowcol_to_position(row_idx, column_idx)]) {
+            return this.fields[rowcol_to_position(row_idx, column_idx)].pawn
+        }
+    }
+
+    get_field_at (row_idx, column_idx) {
+        return this.fields[rowcol_to_position(row_idx, column_idx)];
     }
 
     /**
@@ -420,7 +441,7 @@ class BoardController {
     }
 
     select_pawn(row_idx, column_idx) {
-        let position = row_idx + "_" + column_idx;
+        let position = rowcol_to_position(row_idx, column_idx);
 
         if (this.persistent_board_state.current_move != this.persistent_board_state.fields[position].pawn.color) {
             return;
@@ -437,21 +458,17 @@ class BoardController {
     }
 
     is_field_empty_and_legal (row_idx, column_idx) {
-        if (this.persistent_board_state.fields[row_idx + "_" + column_idx]) {
-            if (this.persistent_board_state.fields[row_idx + "_" + column_idx].pawn)
-                return false;
-            else 
-                return true;
+        if (!this.persistent_board_state.get_field_at(row_idx, column_idx)) {
+            return false; // Out of bounds
         }
-        else {
-            return false;
+        if (this.persistent_board_state.get_pawn_at(row_idx, column_idx)) {
+            return false; // Pawn present
         }
+        return true; // Empty and legal
     }
 
     find_moves () {
-        let [row_idx, column_idx] = this.ephemeral_board_state.selected_pawn.split("_", 2);
-        row_idx = Number(row_idx);
-        column_idx = Number(column_idx);
+        let [row_idx, column_idx] = position_to_rowcol(this.ephemeral_board_state.selected_pawn);
         
         this.find_simple_moves(row_idx, column_idx);
         this.find_queen_moves();
