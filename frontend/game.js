@@ -503,11 +503,14 @@ class BoardController {
             let [enemy_row_idx, enemy_column_idx] = split_positon(enemy);
 
             controller.board_renderer.install_move_callback(landing_row_idx, landing_column_idx, () => {
-                console.log("killing" + enemy + "landing" + landing);
-
+                
                 controller.kill_pawn(enemy_row_idx, enemy_column_idx, landing_row_idx, landing_column_idx);
                 controller.board_renderer.render();
-                controller.install_all_callbacks();
+                if (controller.can_kill_chain()) {
+                    controller.install_kill_callbacks(controller);
+                } else {
+                    controller.install_all_callbacks();
+                }
             });
         }
     }
@@ -548,8 +551,24 @@ class BoardController {
         this.persistent_board_state.set_pawn_at(landing_row_idx, landing_column_idx, selected_pawn);
         this.persistent_board_state.set_pawn_at(selected_row_idx, selected_column_idx, null);
 
-        this.persistent_board_state.switch_current_move();
+
         this.ephemeral_board_state.clear();
+        this.ephemeral_board_state.selected_pawn = idx_to_position(landing_row_idx, landing_column_idx);
+        this.find_kill_moves(landing_row_idx, landing_column_idx);
+
+        if (!this.can_kill_chain()) {
+            this.ephemeral_board_state.clear();
+            this.persistent_board_state.switch_current_move();
+        }
+    }
+
+    can_kill_chain () {
+        if (Object.keys(this.ephemeral_board_state.killing_moves).length) {
+            return true;
+        }
+        else {
+            return false;
+        }
     }
 
     is_field_empty_and_legal (row_idx, column_idx) {
