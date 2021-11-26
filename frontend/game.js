@@ -210,18 +210,21 @@ class EphemeralBoardState {
 
     /** @type {Object.<string, null>} */ selectable_pawns;
     /** @type {string} */ selected_pawn;
-    /** @type {Object.<string, null} */ legal_moves;
+    /** @type {Object.<string, null>} */ legal_moves;
+    /** @type {Object.<string, string>} */ killing_moves;
     
     constructor () {
         this.selectable_pawns = {};
         this.selected_pawn = null;
         this.legal_moves = {};
+        this.killing_moves = {};
     }
 
     clear () {
         this.selectable_pawns = {};
         this.selected_pawn = null;
         this.legal_moves = {};
+        this.killing_moves = {};
     }
 }
 
@@ -384,6 +387,7 @@ class BoardRenderer {
     render_ephemeral () {
         this.render_selected();
         this.render_legal_moves();
+        this.render_killing_moves();
     }
 
     render_selected () {
@@ -396,14 +400,22 @@ class BoardRenderer {
         }
     }
 
-    render_legal_moves () {
-        for (let  [legal_move_position, _value] of Object.entries(this.ephemeral_board_state.legal_moves)) {
+    render_moves (move_dictionary) {
+        for (let [move_position, _value] of Object.entries(move_dictionary)) {
             let legal_move_indicator = document.createElement("button");
             legal_move_indicator.setAttribute("class", "possible-move");
 
-            this.legal_move_indicators[legal_move_position] = legal_move_indicator;
-            this.cells[legal_move_position].appendChild(legal_move_indicator);
+            this.legal_move_indicators[move_position] = legal_move_indicator;
+            this.cells[move_position].appendChild(legal_move_indicator);
         }
+    }
+
+    render_legal_moves () {
+        this.render_moves(this.ephemeral_board_state.legal_moves);
+    }
+
+    render_killing_moves () {
+        this.render_moves(this.ephemeral_board_state.killing_moves);
     }
 
     /**
@@ -516,11 +528,11 @@ class BoardController {
         
         this.find_simple_moves(row_idx, column_idx);
         this.find_queen_moves();
-        this.find_kill_moves();
+        this.find_kill_moves(row_idx, column_idx);
         this.find_queen_kill_moves();
     }
 
-    check_and_set (row_idx, column_idx) {
+    simple_check_and_set (row_idx, column_idx) {
         if (this.is_field_empty_and_legal(row_idx, column_idx)) {
             this.ephemeral_board_state.legal_moves[row_idx + "_" + column_idx] = true;
         }
@@ -528,13 +540,11 @@ class BoardController {
 
     find_simple_moves (row_idx, column_idx) {
         if (this.persistent_board_state.current_move == "white") {
-            this.check_and_set(row_idx - 1, column_idx + 1);
-            this.check_and_set(row_idx - 1, column_idx - 1);
+            this.simple_check_and_set(row_idx - 1, column_idx + 1);
+            this.simple_check_and_set(row_idx - 1, column_idx - 1);
         } else if (this.persistent_board_state.current_move == "black"){
-            this.check_and_set(row_idx + 1, column_idx + 1);
-            this.check_and_set(row_idx + 1, column_idx - 1);
-        } else {
-            console.error("Current move is not eithe white or black!");
+            this.simple_check_and_set(row_idx + 1, column_idx + 1);
+            this.simple_check_and_set(row_idx + 1, column_idx - 1);
         }
     }
 
@@ -542,8 +552,30 @@ class BoardController {
         
     }
 
-    find_kill_moves() {
+    is_field_contains_enemy (row_idx, column_idx) {
+        let enemy_pawn = this.persistent_board_state.get_pawn_at(row_idx, column_idx);
+        if (enemy_pawn) {
+            return this.persistent_board_state.current_move != enemy_pawn.color;
+        }
+        return false
+    }
 
+    kill_check_and_set (enemy_row_idx, enemy_column_idx, landing_row_idx, landing_column_idx) {
+        let kill_legal = this.is_field_contains_enemy(enemy_row_idx, enemy_column_idx);
+        let landing_legal = this.is_field_empty_and_legal(landing_row_idx, landing_column_idx);
+
+        if (kill_legal && landing_legal) {
+            this.ephemeral_board_state.killing_moves[
+                rowcol_to_position(landing_row_idx, landing_column_idx)
+            ] = rowcol_to_position(enemy_row_idx, enemy_column_idx);
+        }
+    }
+
+    find_kill_moves(row_idx, column_idx) {
+        this.kill_check_and_set(row_idx + 1, column_idx + 1, row_idx + 2, column_idx + 2);
+        this.kill_check_and_set(row_idx - 1, column_idx + 1, row_idx - 2, column_idx + 2);
+        this.kill_check_and_set(row_idx + 1, column_idx - 1, row_idx + 2, column_idx - 2);
+        this.kill_check_and_set(row_idx - 1, column_idx - 1, row_idx - 2, column_idx - 2);
     }
 
     find_queen_kill_moves() {
