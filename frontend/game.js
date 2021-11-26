@@ -23,7 +23,7 @@ function rowcol_to_position (row_idx, column_idx) {
     return row_idx + "_" + column_idx;
 }
 
-function position_to_rowcol (position) {
+function split_posiiton (position) {
     let [row_idx, column_idx] = position.split("_", 2);
     row_idx = Number(row_idx);
     column_idx = Number(column_idx);
@@ -115,9 +115,23 @@ class PersistentBoardState {
         }
     }
 
+    switch_current_move () {
+        if (this.current_move == "black") {
+            this.current_move = "white";
+        } else {
+            this.current_move = "black";
+        }
+    }
+
     get_pawn_at (row_idx, column_idx) {
         if (this.fields[rowcol_to_position(row_idx, column_idx)]) {
             return this.fields[rowcol_to_position(row_idx, column_idx)].pawn
+        }
+    }
+
+    set_pawn_at (row_idx, column_idx, new_pawn) {
+        if (this.fields[rowcol_to_position(row_idx, column_idx)]) {
+            this.fields[rowcol_to_position(row_idx, column_idx)].pawn = new_pawn;
         }
     }
 
@@ -387,6 +401,7 @@ class BoardRenderer {
             let legal_move_indicator = document.createElement("button");
             legal_move_indicator.setAttribute("class", "possible-move");
 
+            this.legal_move_indicators[legal_move_position] = legal_move_indicator;
             this.cells[legal_move_position].appendChild(legal_move_indicator);
         }
     }
@@ -403,11 +418,19 @@ class BoardRenderer {
      * Callback installation functions
      */
 
-    install_select_callback(at_row, at_column, callback) {
-        if (this.pawns[at_row + "_" + at_column]) {
-            this.pawns[at_row + "_" + at_column].onclick = callback;
+    install_select_callback(row_idx, column_idx, callback) {
+        if (this.pawns[rowcol_to_position(row_idx, column_idx)]) {
+            this.pawns[rowcol_to_position(row_idx, column_idx)].onclick = callback;
         } else {
             console.error("Tried installing callback on non-existent pawn!");
+        }
+    }
+
+    install_legal_move_callback(row_idx, column_idx, callback) {
+        if (this.legal_move_indicators[rowcol_to_position(row_idx, column_idx)]) {
+            this.legal_move_indicators[rowcol_to_position(row_idx, column_idx)].onclick = callback;
+        } else {
+            console.error("Tried installing callback on non-existent legal move indicator!");
         }
     }
 }
@@ -429,6 +452,7 @@ class BoardController {
 
     install_all_select_callbacks() {
         let controller = this;
+
         this.persistent_board_state.for_each_field((row_idx, column_idx, field) => {
             if (field.pawn) {
                 this.board_renderer.install_select_callback(row_idx, column_idx, () => {
@@ -438,6 +462,15 @@ class BoardController {
                 });
             }
         });
+
+        for (let [position, _value] of Object.entries(this.ephemeral_board_state.legal_moves)) {
+            let [row_idx, column_idx] = split_posiiton(position);
+            this.board_renderer.install_legal_move_callback(row_idx, column_idx, () => {
+                controller.move_pawn_to(row_idx, column_idx);
+                controller.board_renderer.render();
+                controller.install_all_select_callbacks();
+            });
+        }
     }
 
     select_pawn(row_idx, column_idx) {
@@ -457,6 +490,17 @@ class BoardController {
         }
     }
 
+    move_pawn_to (move_row_idx, move_column_idx) {
+        let [selected_row_idx, selected_column_idx] = split_posiiton(this.ephemeral_board_state.selected_pawn);
+        let selected_pawn = this.persistent_board_state.get_pawn_at(selected_row_idx, selected_column_idx);
+        
+        this.persistent_board_state.set_pawn_at(move_row_idx, move_column_idx, selected_pawn);
+        this.persistent_board_state.set_pawn_at(selected_row_idx, selected_column_idx, null)
+        this.persistent_board_state.switch_current_move();
+
+        this.ephemeral_board_state.clear();
+    }
+
     is_field_empty_and_legal (row_idx, column_idx) {
         if (!this.persistent_board_state.get_field_at(row_idx, column_idx)) {
             return false; // Out of bounds
@@ -468,7 +512,7 @@ class BoardController {
     }
 
     find_moves () {
-        let [row_idx, column_idx] = position_to_rowcol(this.ephemeral_board_state.selected_pawn);
+        let [row_idx, column_idx] = split_posiiton(this.ephemeral_board_state.selected_pawn);
         
         this.find_simple_moves(row_idx, column_idx);
         this.find_queen_moves();
@@ -484,13 +528,13 @@ class BoardController {
 
     find_simple_moves (row_idx, column_idx) {
         if (this.persistent_board_state.current_move == "white") {
-            this.check_and_set(row_idx - 1, column_idx + 1)
-            this.check_and_set(row_idx - 1, column_idx - 1)
+            this.check_and_set(row_idx - 1, column_idx + 1);
+            this.check_and_set(row_idx - 1, column_idx - 1);
         } else if (this.persistent_board_state.current_move == "black"){
-            this.check_and_set(row_idx + 1, column_idx + 1)
-            this.check_and_set(row_idx + 1, column_idx - 1)
+            this.check_and_set(row_idx + 1, column_idx + 1);
+            this.check_and_set(row_idx + 1, column_idx - 1);
         } else {
-            console.error("Current move is not eithe white or black!")
+            console.error("Current move is not eithe white or black!");
         }
     }
 
