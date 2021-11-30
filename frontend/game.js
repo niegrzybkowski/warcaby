@@ -1,4 +1,4 @@
-function test () {
+window.onload = function() {
     let bs = new PersistentBoardState(true);
     let es = new EphemeralBoardState();
     es.selected_pawn = "6_1";
