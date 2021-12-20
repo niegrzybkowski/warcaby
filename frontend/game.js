@@ -1,7 +1,6 @@
 window.onload = function() {
     let bs = new PersistentBoardState(true);
     let es = new EphemeralBoardState();
-    es.selected_pawn = "6_1";
 
     let br = new BoardRenderer(
         bs,
@@ -13,8 +12,11 @@ window.onload = function() {
         es,
         br
     );
+    
+    // bs.fields["6_1"].pawn.queen = true;
+    
     br.render();
-    bc.install_all_callbacks();
+    bc.finalize_state();
 
     return [bs, es, br, bc];
 }
@@ -91,12 +93,15 @@ class PersistentBoardState {
     /** @type {Object} */
     last_move;
 
+    /** @type {string} */
+    winner;
+
     /**
      * 
-     * @param {boolean} default_init 
+     * @param {boolean} do_default_init 
      */
-    constructor(default_init) {
-        if (default_init) {
+    constructor(do_default_init) {
+        if (do_default_init) {
             this.initialize_default()
         }
     }
@@ -282,7 +287,12 @@ class BoardRenderer {
         this.container.appendChild(info_container);
 
         this.render_config();
-        this.render_current_move();
+        if (this.persistent_board_state.winner) {
+            this.render_winner();
+        } 
+        else {
+            this.render_current_move();
+        }
     }
 
     render_config () {
@@ -302,6 +312,14 @@ class BoardRenderer {
         
         this.game_information.appendChild(paragraph);
         this.game_information.appendChild(settings_list);
+    }
+
+    render_winner () {
+        let paragraph = document.createElement("p");
+        paragraph.appendChild(document.createTextNode(
+            "The winner is " + this.persistent_board_state.winner + "!"
+        ));
+        this.game_information.appendChild(paragraph);
     }
 
     render_current_move () {
@@ -375,6 +393,10 @@ class BoardRenderer {
             if (field.pawn) {
                 let pawn_button = document.createElement("button");
                 
+                if (field.pawn.queen) {
+                    pawn_button.innerHTML = "Q";
+                }
+
                 if (field.pawn.color == "white") {
                     pawn_button.setAttribute("class", "pawn-white");
                 }
@@ -466,7 +488,7 @@ class BoardController {
         this.board_renderer = board_renderer;
     }
 
-    install_all_callbacks() {
+    finalize_state() {
         let controller = this;
 
         this.install_select_callbacks(controller);
@@ -480,7 +502,7 @@ class BoardController {
                 controller.board_renderer.install_select_callback(row_idx, column_idx, () => {
                     controller.select_pawn(row_idx, column_idx);
                     controller.board_renderer.render();
-                    controller.install_all_callbacks();
+                    controller.finalize_state();
                 });
             }
         });
@@ -492,7 +514,7 @@ class BoardController {
             controller.board_renderer.install_move_callback(row_idx, column_idx, () => {
                 controller.move_pawn_to(row_idx, column_idx);
                 controller.board_renderer.render();
-                controller.install_all_callbacks();
+                controller.finalize_state();
             });
         }
     }
@@ -509,7 +531,7 @@ class BoardController {
                 if (controller.can_kill_chain()) {
                     controller.install_kill_callbacks(controller);
                 } else {
-                    controller.install_all_callbacks();
+                    controller.finalize_state();
                 }
             });
         }
@@ -539,8 +561,7 @@ class BoardController {
         this.persistent_board_state.set_pawn_at(move_row_idx, move_column_idx, selected_pawn);
         this.persistent_board_state.set_pawn_at(selected_row_idx, selected_column_idx, null);
 
-        this.persistent_board_state.switch_current_move();
-        this.ephemeral_board_state.clear();
+        this.end_turn();
     }
 
     kill_pawn (pawn_row_idx, pawn_column_idx, landing_row_idx, landing_column_idx) {
@@ -557,8 +578,7 @@ class BoardController {
         this.find_kill_moves(landing_row_idx, landing_column_idx);
 
         if (!this.can_kill_chain()) {
-            this.ephemeral_board_state.clear();
-            this.persistent_board_state.switch_current_move();
+            this.end_turn();
         }
     }
 
@@ -583,11 +603,18 @@ class BoardController {
 
     find_moves () {
         let [row_idx, column_idx] = split_positon(this.ephemeral_board_state.selected_pawn);
-        
-        this.find_simple_moves(row_idx, column_idx);
-        this.find_queen_moves();
-        this.find_kill_moves(row_idx, column_idx);
-        this.find_queen_kill_moves();
+        let pawn = this.persistent_board_state.get_pawn_at(row_idx, column_idx);
+        if (pawn) {
+            if (pawn.queen) {
+                this.find_queen_moves(row_idx, column_idx);
+            }
+            else {
+                this.find_simple_moves(row_idx, column_idx);     
+            }
+            this.find_kill_moves(row_idx, column_idx);
+        } else {
+            console.error("selected pawn doesn't exist?")
+        }
     }
 
     simple_check_and_set (row_idx, column_idx) {
@@ -606,8 +633,31 @@ class BoardController {
         }
     }
 
-    find_queen_moves () {
-        
+    slide_while_legal (from_row_idx, from_column_idx, direction_row, direction_column) {
+        let size = this.persistent_board_state.configuration.size;
+        let current_row_idx = from_row_idx + direction_row;
+        let current_column_idx = from_column_idx + direction_column;
+
+        while (
+            1 <= current_row_idx    && current_row_idx    <= size &&
+            1 <= current_column_idx && current_column_idx <= size 
+            ) {
+            // if there is a pawn in the way, stop scanning
+            if (this.persistent_board_state.get_pawn_at(current_row_idx, current_column_idx)) {
+                break;
+            }
+
+            this.simple_check_and_set(current_row_idx, current_column_idx);
+            current_row_idx += direction_row;
+            current_column_idx += direction_column;
+        }
+    }
+
+    find_queen_moves (row_idx, column_idx) {
+        this.slide_while_legal(row_idx, column_idx,  1,  1);
+        this.slide_while_legal(row_idx, column_idx,  1, -1);
+        this.slide_while_legal(row_idx, column_idx, -1,  1);
+        this.slide_while_legal(row_idx, column_idx, -1, -1);
     }
 
     is_field_contains_enemy (row_idx, column_idx) {
@@ -636,7 +686,45 @@ class BoardController {
         this.kill_check_and_set(row_idx - 1, column_idx - 1, row_idx - 2, column_idx - 2);
     }
 
-    find_queen_kill_moves() {
+    queen_promotion_check () {
+        let size = this.persistent_board_state.configuration.size;
+        for (let column_idx = 1; column_idx <= size; column_idx += 1) {
+            let top_pawn = this.persistent_board_state.get_pawn_at(1, column_idx);
+            if (top_pawn && top_pawn.color == "white") {
+                top_pawn.queen = true;
+            }
+            let bottom_pawn = this.persistent_board_state.get_pawn_at(size, column_idx);
+            if (bottom_pawn && bottom_pawn.color == "black") {
+                bottom_pawn.queen = true;
+            }
+        }
+    }
 
+    victory_check () {
+        let is_black_winner = true;
+        let is_white_winner =  true;
+
+        this.persistent_board_state.for_each_field((_r, _c, field) => {
+            if (field.pawn && field.pawn.color == "white") {
+                is_black_winner = false;
+            }
+            if (field.pawn && field.pawn.color == "black") {
+                is_white_winner = false;
+            }
+        });
+        if (is_white_winner) {
+            this.persistent_board_state.winner = "white";
+        } 
+        if (is_black_winner) {
+            this.persistent_board_state.winner = "black";
+        }
+    }
+
+    end_turn () {
+        this.persistent_board_state.switch_current_move();
+        this.ephemeral_board_state.clear();
+        
+        this.queen_promotion_check();
+        this.victory_check();
     }
 }
