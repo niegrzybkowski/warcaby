@@ -593,15 +593,14 @@ class BoardController {
         if (pawn) {
             if (pawn.queen) {
                 this.find_queen_moves(row_idx, column_idx);
-                this.find_queen_kill_moves(row_idx, column_idx);
             }
             else {
-                this.find_simple_moves(row_idx, column_idx);
-                this.find_kill_moves(row_idx, column_idx);      
+                this.find_simple_moves(row_idx, column_idx);     
             }
+            this.find_kill_moves(row_idx, column_idx);
+        } else {
+            console.error("selected pawn doesn't exist?")
         }
-        
-        
     }
 
     simple_check_and_set (row_idx, column_idx) {
@@ -671,9 +670,5 @@ class BoardController {
         this.kill_check_and_set(row_idx - 1, column_idx + 1, row_idx - 2, column_idx + 2);
         this.kill_check_and_set(row_idx + 1, column_idx - 1, row_idx + 2, column_idx - 2);
         this.kill_check_and_set(row_idx - 1, column_idx - 1, row_idx - 2, column_idx - 2);
-    }
-
-    find_queen_kill_moves(row_idx, column_idx) {
-
     }
 }
