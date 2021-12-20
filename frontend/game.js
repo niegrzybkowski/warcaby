@@ -586,11 +586,19 @@ class BoardController {
 
     find_moves () {
         let [row_idx, column_idx] = split_positon(this.ephemeral_board_state.selected_pawn);
+        let pawn = this.persistent_board_state.get_pawn_at(row_idx, column_idx);
+        if (pawn) {
+            if (pawn.queen) {
+                this.find_queen_moves(row_idx, column_idx);
+                this.find_queen_kill_moves(row_idx, column_idx);
+            }
+            else {
+                this.find_simple_moves(row_idx, column_idx);
+                this.find_kill_moves(row_idx, column_idx);      
+            }
+        }
         
-        this.find_simple_moves(row_idx, column_idx);
-        this.find_queen_moves();
-        this.find_kill_moves(row_idx, column_idx);
-        this.find_queen_kill_moves();
+        
     }
 
     simple_check_and_set (row_idx, column_idx) {
@@ -609,7 +617,7 @@ class BoardController {
         }
     }
 
-    find_queen_moves () {
+    find_queen_moves (row_idx, column_idx) {
         
     }
 
@@ -639,7 +647,7 @@ class BoardController {
         this.kill_check_and_set(row_idx - 1, column_idx - 1, row_idx - 2, column_idx - 2);
     }
 
-    find_queen_kill_moves() {
+    find_queen_kill_moves(row_idx, column_idx) {
 
     }
 }
