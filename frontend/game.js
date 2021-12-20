@@ -12,6 +12,9 @@ window.onload = function() {
         es,
         br
     );
+    
+    bs.fields["6_1"].pawn.queen = true;
+    
     br.render();
     bc.install_all_callbacks();
 
@@ -617,8 +620,31 @@ class BoardController {
         }
     }
 
+    slide_while_legal (from_row_idx, from_column_idx, direction_row, direction_column) {
+        let size = this.persistent_board_state.configuration.size;
+        let current_row_idx = from_row_idx + direction_row;
+        let current_column_idx = from_column_idx + direction_column;
+
+        while (
+            1 <= current_row_idx    && current_row_idx    <= size &&
+            1 <= current_column_idx && current_column_idx <= size 
+            ) {
+            // if there is a pawn in the way, stop scanning
+            if (this.persistent_board_state.get_pawn_at(current_row_idx, current_column_idx)) {
+                break;
+            }
+
+            this.simple_check_and_set(current_row_idx, current_column_idx);
+            current_row_idx += direction_row;
+            current_column_idx += direction_column;
+        }
+    }
+
     find_queen_moves (row_idx, column_idx) {
-        
+        this.slide_while_legal(row_idx, column_idx,  1,  1);
+        this.slide_while_legal(row_idx, column_idx,  1, -1);
+        this.slide_while_legal(row_idx, column_idx, -1,  1);
+        this.slide_while_legal(row_idx, column_idx, -1, -1);
     }
 
     is_field_contains_enemy (row_idx, column_idx) {
