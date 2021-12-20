@@ -52,7 +52,7 @@ class BoardConfiguration {
         this.starting_player = starting_player;
     }
 
-    static default_config = new BoardConfiguration(4, 1, "white");
+    static default_config = new BoardConfiguration(8, 3, "white");
 }
 
 class Field {
