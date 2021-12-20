@@ -1,7 +1,6 @@
 window.onload = function() {
     let bs = new PersistentBoardState(true);
     let es = new EphemeralBoardState();
-    es.selected_pawn = "6_1";
 
     let br = new BoardRenderer(
         bs,
@@ -375,6 +374,10 @@ class BoardRenderer {
             if (field.pawn) {
                 let pawn_button = document.createElement("button");
                 
+                if (field.pawn.queen) {
+                    pawn_button.innerHTML = "Q";
+                }
+
                 if (field.pawn.color == "white") {
                     pawn_button.setAttribute("class", "pawn-white");
                 }

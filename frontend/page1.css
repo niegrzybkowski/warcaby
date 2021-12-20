@@ -38,6 +38,8 @@ th, td {
   background-color: black;
   cursor: pointer;
   text-align: center;
+
+  color: white;
 }
 
 .pawn-white {
@@ -49,6 +51,8 @@ th, td {
   background-color: lightyellow;
   cursor: pointer;
   text-align: center;
+
+  color: black;
 }
 
 .pawn-black-selected {
@@ -64,6 +68,8 @@ th, td {
   background-color: black;
   cursor: pointer;
   text-align: center;
+  
+  color: white;
 }
 
 .pawn-white-selected {
@@ -92,4 +98,6 @@ th, td {
   background-color: blue;
   cursor: pointer;
   text-align: center;
+
+  color: black;
 }
