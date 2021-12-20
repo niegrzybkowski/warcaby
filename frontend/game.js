@@ -93,12 +93,15 @@ class PersistentBoardState {
     /** @type {Object} */
     last_move;
 
+    /** @type {string} */
+    winner;
+
     /**
      * 
-     * @param {boolean} default_init 
+     * @param {boolean} do_default_init 
      */
-    constructor(default_init) {
-        if (default_init) {
+    constructor(do_default_init) {
+        if (do_default_init) {
             this.initialize_default()
         }
     }
@@ -284,7 +287,12 @@ class BoardRenderer {
         this.container.appendChild(info_container);
 
         this.render_config();
-        this.render_current_move();
+        if (this.persistent_board_state.winner) {
+            this.render_winner();
+        } 
+        else {
+            this.render_current_move();
+        }
     }
 
     render_config () {
@@ -304,6 +312,14 @@ class BoardRenderer {
         
         this.game_information.appendChild(paragraph);
         this.game_information.appendChild(settings_list);
+    }
+
+    render_winner () {
+        let paragraph = document.createElement("p");
+        paragraph.appendChild(document.createTextNode(
+            "The winner is " + this.persistent_board_state.winner + "!"
+        ));
+        this.game_information.appendChild(paragraph);
     }
 
     render_current_move () {
@@ -684,11 +700,31 @@ class BoardController {
         }
     }
 
+    victory_check () {
+        let is_black_winner = true;
+        let is_white_winner =  true;
+
+        this.persistent_board_state.for_each_field((_r, _c, field) => {
+            if (field.pawn && field.pawn.color == "white") {
+                is_black_winner = false;
+            }
+            if (field.pawn && field.pawn.color == "black") {
+                is_white_winner = false;
+            }
+        });
+        if (is_white_winner) {
+            this.persistent_board_state.winner = "white";
+        } 
+        if (is_black_winner) {
+            this.persistent_board_state.winner = "black";
+        }
+    }
+
     end_turn () {
         this.persistent_board_state.switch_current_move();
         this.ephemeral_board_state.clear();
         
         this.queen_promotion_check();
-        
+        this.victory_check();
     }
 }
