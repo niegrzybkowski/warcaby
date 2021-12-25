@@ -464,7 +464,7 @@ class BoardRenderer {
         }
     }
 
-    install_move_callback(row_idx, column_idx, callback) {
+    install_move_indicator_callback(row_idx, column_idx, callback) {
         if (this.legal_move_indicators[idx_to_position(row_idx, column_idx)]) {
             this.legal_move_indicators[idx_to_position(row_idx, column_idx)].onclick = callback;
         } else {
@@ -629,7 +629,7 @@ class BoardController {
     install_move_callbacks(controller) {
         for (let [position, _value] of Object.entries(controller.ephemeral_board_state.legal_moves)) {
             let [row_idx, column_idx] = split_positon(position);
-            controller.board_renderer.install_move_callback(row_idx, column_idx, () => {
+            controller.board_renderer.install_move_indicator_callback(row_idx, column_idx, () => {
                 controller.move_pawn_to(row_idx, column_idx);
                 controller.board_renderer.render();
                 controller.install_all_callbacks();
@@ -642,7 +642,7 @@ class BoardController {
             let [landing_row_idx, landing_column_idx] = split_positon(landing); 
             let [enemy_row_idx, enemy_column_idx] = split_positon(enemy);
 
-            controller.board_renderer.install_move_callback(landing_row_idx, landing_column_idx, () => {
+            controller.board_renderer.install_move_indicator_callback(landing_row_idx, landing_column_idx, () => {
                 
                 controller.kill_pawn(enemy_row_idx, enemy_column_idx, landing_row_idx, landing_column_idx);
                 controller.board_renderer.render();
