@@ -16,7 +16,7 @@ window.onload = function() {
     // bs.fields["6_1"].pawn.queen = true;
     
     br.render();
-    bc.finalize_state();
+    bc.install_all_callbacks();
 
     return [bs, es, br, bc];
 }
@@ -488,7 +488,7 @@ class BoardController {
         this.board_renderer = board_renderer;
     }
 
-    finalize_state() {
+    install_all_callbacks() {
         let controller = this;
 
         this.install_select_callbacks(controller);
@@ -502,7 +502,7 @@ class BoardController {
                 controller.board_renderer.install_select_callback(row_idx, column_idx, () => {
                     controller.select_pawn(row_idx, column_idx);
                     controller.board_renderer.render();
-                    controller.finalize_state();
+                    controller.install_all_callbacks();
                 });
             }
         });
@@ -514,7 +514,7 @@ class BoardController {
             controller.board_renderer.install_move_callback(row_idx, column_idx, () => {
                 controller.move_pawn_to(row_idx, column_idx);
                 controller.board_renderer.render();
-                controller.finalize_state();
+                controller.install_all_callbacks();
             });
         }
     }
@@ -531,7 +531,7 @@ class BoardController {
                 if (controller.can_kill_chain()) {
                     controller.install_kill_callbacks(controller);
                 } else {
-                    controller.finalize_state();
+                    controller.install_all_callbacks();
                 }
             });
         }
