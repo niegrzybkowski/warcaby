@@ -1,5 +1,7 @@
 window.onload = function() {
-    let bs = new PersistentBoardState(true);
+    let bs = new PersistentBoardState(
+        BoardConfiguration.default_config
+    );
     let es = new EphemeralBoardState();
 
     let br = new BoardRenderer(
@@ -11,10 +13,7 @@ window.onload = function() {
         bs,
         es,
         br
-    );
-    
-    // bs.fields["6_1"].pawn.queen = true;
-    
+    );    
     br.render();
     bc.install_all_callbacks();
 
@@ -92,18 +91,12 @@ class PersistentBoardState {
     current_move;
     /** @type {Object} */
     last_move;
-
     /** @type {string} */
     winner;
 
-    /**
-     * 
-     * @param {boolean} do_default_init 
-     */
-    constructor(do_default_init) {
-        if (do_default_init) {
-            this.initialize_default()
-        }
+    constructor(configuration) {
+        this.configuration = configuration;
+        this.initialize_board_state();
     }
 
     /**
@@ -153,11 +146,10 @@ class PersistentBoardState {
     }
 
     /**
-     * Default initialization functions
+     * Initialization functions
      */
 
-    initialize_default() {
-        this.configuration = BoardConfiguration.default_config;
+    initialize_board_state() {
         this.current_move = this.configuration.starting_player;
         this.initialize_fields();
         this.initialize_pawns();
