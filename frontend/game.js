@@ -3,7 +3,6 @@ window.onload = function() {
         BoardConfiguration.default_config
     );
     let es = new EphemeralBoardState();
-
     let br = new BoardRenderer(
         bs,
         es,
@@ -446,7 +445,7 @@ class BoardRenderer {
      * Callback installation functions
      */
 
-    install_select_callback(row_idx, column_idx, callback) {
+    install_pawn_callback(row_idx, column_idx, callback) {
         if (this.pawns[idx_to_position(row_idx, column_idx)]) {
             this.pawns[idx_to_position(row_idx, column_idx)].onclick = callback;
         } else {
@@ -606,7 +605,7 @@ class BoardController {
 
     install_select_callbacks(controller) {
         controller.persistent_board_state.for_each_pawn((row_idx, column_idx, pawn) => {
-            controller.board_renderer.install_select_callback(row_idx, column_idx, () => {
+            controller.board_renderer.install_pawn_callback(row_idx, column_idx, () => {
                 controller.select_pawn(row_idx, column_idx);
                 controller.board_renderer.render();
                 controller.install_all_callbacks();
