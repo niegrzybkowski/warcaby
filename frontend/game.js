@@ -473,117 +473,35 @@ class BoardRenderer {
     }
 }
 
-class BoardController {
+class MoveFinder {
     /**
-     * Game logic
+     * Utility class for managing ephemeral state - finding moves
      */
 
-    /** @type {PersistentBoardState} */ persistent_board_state;
-    /** @type {EphemeralBoardState} */ ephemeral_board_state;
-    /** @type {BoardRenderer} */ board_renderer;
+    persistent_board_state;
+    ephemeral_board_state;
 
-    constructor (persistent_board_state, ephemeral_board_state, board_renderer) {
+    constructor (persistent_board_state, ephemeral_board_state) {
         this.persistent_board_state = persistent_board_state;
         this.ephemeral_board_state = ephemeral_board_state;
-        this.board_renderer = board_renderer;
     }
 
-    install_all_callbacks() {
-        let controller = this;
-
-        this.install_select_callbacks(controller);
-        this.install_move_callbacks(controller);
-        this.install_kill_callbacks(controller);
-    }
-
-    install_select_callbacks(controller) {
-        controller.persistent_board_state.for_each_field((row_idx, column_idx, field) => {
-            if (field.pawn) {
-                controller.board_renderer.install_select_callback(row_idx, column_idx, () => {
-                    controller.select_pawn(row_idx, column_idx);
-                    controller.board_renderer.render();
-                    controller.install_all_callbacks();
-                });
+    find_moves () {
+        let [row_idx, column_idx] = split_positon(this.ephemeral_board_state.selected_pawn);
+        let pawn = this.persistent_board_state.get_pawn_at(row_idx, column_idx);
+        if (pawn) {
+            if (pawn.queen) {
+                this.find_queen_moves(row_idx, column_idx);
             }
-        });
-    }
-
-    install_move_callbacks(controller) {
-        for (let [position, _value] of Object.entries(controller.ephemeral_board_state.legal_moves)) {
-            let [row_idx, column_idx] = split_positon(position);
-            controller.board_renderer.install_move_callback(row_idx, column_idx, () => {
-                controller.move_pawn_to(row_idx, column_idx);
-                controller.board_renderer.render();
-                controller.install_all_callbacks();
-            });
-        }
-    }
-
-    install_kill_callbacks (controller) {
-        for (let [landing, enemy] of Object.entries(controller.ephemeral_board_state.killing_moves)) {
-            let [landing_row_idx, landing_column_idx] = split_positon(landing); 
-            let [enemy_row_idx, enemy_column_idx] = split_positon(enemy);
-
-            controller.board_renderer.install_move_callback(landing_row_idx, landing_column_idx, () => {
-                
-                controller.kill_pawn(enemy_row_idx, enemy_column_idx, landing_row_idx, landing_column_idx);
-                controller.board_renderer.render();
-                if (controller.can_kill_chain()) {
-                    controller.install_kill_callbacks(controller);
-                } else {
-                    controller.install_all_callbacks();
-                }
-            });
-        }
-    }
-
-    select_pawn(row_idx, column_idx) {
-        let position = idx_to_position(row_idx, column_idx);
-
-        if (this.persistent_board_state.current_move != this.persistent_board_state.fields[position].pawn.color) {
-            return;
-        }
-
-        if (this.ephemeral_board_state.selected_pawn == position) {
-            this.ephemeral_board_state.clear();
-        }
-        else {
-            this.ephemeral_board_state.clear();
-            this.ephemeral_board_state.selected_pawn = position;
-            this.find_moves();
-        }
-    }
-
-    move_pawn_to (move_row_idx, move_column_idx) {
-        let [selected_row_idx, selected_column_idx] = split_positon(this.ephemeral_board_state.selected_pawn);
-        let selected_pawn = this.persistent_board_state.get_pawn_at(selected_row_idx, selected_column_idx);
-        
-        this.persistent_board_state.set_pawn_at(move_row_idx, move_column_idx, selected_pawn);
-        this.persistent_board_state.set_pawn_at(selected_row_idx, selected_column_idx, null);
-
-        this.end_turn();
-    }
-
-    kill_pawn (pawn_row_idx, pawn_column_idx, landing_row_idx, landing_column_idx) {
-        let [selected_row_idx, selected_column_idx] = this.ephemeral_board_state.get_selected_idx();
-        let selected_pawn = this.persistent_board_state.get_pawn_at(selected_row_idx, selected_column_idx);
-
-        this.persistent_board_state.set_pawn_at(pawn_row_idx, pawn_column_idx, null);
-        this.persistent_board_state.set_pawn_at(landing_row_idx, landing_column_idx, selected_pawn);
-        this.persistent_board_state.set_pawn_at(selected_row_idx, selected_column_idx, null);
-
-
-        this.ephemeral_board_state.clear();
-        this.ephemeral_board_state.selected_pawn = idx_to_position(landing_row_idx, landing_column_idx);
-        this.find_kill_moves(landing_row_idx, landing_column_idx);
-
-        if (!this.can_kill_chain()) {
-            this.end_turn();
+            else {
+                this.find_simple_moves(row_idx, column_idx);     
+            }
+            this.find_kill_moves(row_idx, column_idx);
         }
     }
 
     can_kill_chain () {
-        if (Object.keys(this.ephemeral_board_state.killing_moves).length) {
+        if (Object.keys(this.ephemeral_board_state.killing_moves).length != 0) {
             return true;
         }
         else {
@@ -599,22 +517,6 @@ class BoardController {
             return false; // Pawn present
         }
         return true; // Empty and legal
-    }
-
-    find_moves () {
-        let [row_idx, column_idx] = split_positon(this.ephemeral_board_state.selected_pawn);
-        let pawn = this.persistent_board_state.get_pawn_at(row_idx, column_idx);
-        if (pawn) {
-            if (pawn.queen) {
-                this.find_queen_moves(row_idx, column_idx);
-            }
-            else {
-                this.find_simple_moves(row_idx, column_idx);     
-            }
-            this.find_kill_moves(row_idx, column_idx);
-        } else {
-            console.error("selected pawn doesn't exist?")
-        }
     }
 
     simple_check_and_set (row_idx, column_idx) {
@@ -684,6 +586,118 @@ class BoardController {
         this.kill_check_and_set(row_idx - 1, column_idx + 1, row_idx - 2, column_idx + 2);
         this.kill_check_and_set(row_idx + 1, column_idx - 1, row_idx + 2, column_idx - 2);
         this.kill_check_and_set(row_idx - 1, column_idx - 1, row_idx - 2, column_idx - 2);
+    }
+}
+
+class BoardController {
+    /**
+     * Game logic
+     */
+
+    /** @type {PersistentBoardState} */ persistent_board_state;
+    /** @type {EphemeralBoardState} */ ephemeral_board_state;
+    /** @type {BoardRenderer} */ board_renderer;
+    /** @type {MoveFinder} */ move_finder;
+
+    constructor (persistent_board_state, ephemeral_board_state, board_renderer) {
+        this.persistent_board_state = persistent_board_state;
+        this.ephemeral_board_state = ephemeral_board_state;
+        this.board_renderer = board_renderer;
+        this.move_finder = new MoveFinder(persistent_board_state, ephemeral_board_state);
+    }
+
+    install_all_callbacks() {
+        let controller = this;
+
+        this.install_select_callbacks(controller);
+        this.install_move_callbacks(controller);
+        this.install_kill_callbacks(controller);
+    }
+
+    install_select_callbacks(controller) {
+        controller.persistent_board_state.for_each_field((row_idx, column_idx, field) => {
+            if (field.pawn) {
+                controller.board_renderer.install_select_callback(row_idx, column_idx, () => {
+                    controller.select_pawn(row_idx, column_idx);
+                    controller.board_renderer.render();
+                    controller.install_all_callbacks();
+                });
+            }
+        });
+    }
+
+    install_move_callbacks(controller) {
+        for (let [position, _value] of Object.entries(controller.ephemeral_board_state.legal_moves)) {
+            let [row_idx, column_idx] = split_positon(position);
+            controller.board_renderer.install_move_callback(row_idx, column_idx, () => {
+                controller.move_pawn_to(row_idx, column_idx);
+                controller.board_renderer.render();
+                controller.install_all_callbacks();
+            });
+        }
+    }
+
+    install_kill_callbacks (controller) {
+        for (let [landing, enemy] of Object.entries(controller.ephemeral_board_state.killing_moves)) {
+            let [landing_row_idx, landing_column_idx] = split_positon(landing); 
+            let [enemy_row_idx, enemy_column_idx] = split_positon(enemy);
+
+            controller.board_renderer.install_move_callback(landing_row_idx, landing_column_idx, () => {
+                
+                controller.kill_pawn(enemy_row_idx, enemy_column_idx, landing_row_idx, landing_column_idx);
+                controller.board_renderer.render();
+                if (controller.move_finder.can_kill_chain()) {
+                    controller.install_kill_callbacks(controller);
+                } else {
+                    controller.install_all_callbacks();
+                }
+            });
+        }
+    }
+
+    select_pawn(row_idx, column_idx) {
+        let position = idx_to_position(row_idx, column_idx);
+
+        if (this.persistent_board_state.current_move != this.persistent_board_state.fields[position].pawn.color) {
+            return;
+        }
+
+        if (this.ephemeral_board_state.selected_pawn == position) {
+            this.ephemeral_board_state.clear();
+        }
+        else {
+            this.ephemeral_board_state.clear();
+            this.ephemeral_board_state.selected_pawn = position;
+            this.move_finder.find_moves();
+        }
+    }
+
+    move_pawn_to (move_row_idx, move_column_idx) {
+        let [selected_row_idx, selected_column_idx] = split_positon(this.ephemeral_board_state.selected_pawn);
+        let selected_pawn = this.persistent_board_state.get_pawn_at(selected_row_idx, selected_column_idx);
+        
+        this.persistent_board_state.set_pawn_at(move_row_idx, move_column_idx, selected_pawn);
+        this.persistent_board_state.set_pawn_at(selected_row_idx, selected_column_idx, null);
+
+        this.end_turn();
+    }
+
+    kill_pawn (pawn_row_idx, pawn_column_idx, landing_row_idx, landing_column_idx) {
+        let [selected_row_idx, selected_column_idx] = this.ephemeral_board_state.get_selected_idx();
+        let selected_pawn = this.persistent_board_state.get_pawn_at(selected_row_idx, selected_column_idx);
+
+        this.persistent_board_state.set_pawn_at(pawn_row_idx, pawn_column_idx, null);
+        this.persistent_board_state.set_pawn_at(landing_row_idx, landing_column_idx, selected_pawn);
+        this.persistent_board_state.set_pawn_at(selected_row_idx, selected_column_idx, null);
+
+
+        this.ephemeral_board_state.clear();
+        this.ephemeral_board_state.selected_pawn = idx_to_position(landing_row_idx, landing_column_idx);
+        this.move_finder.find_kill_moves(landing_row_idx, landing_column_idx);
+
+        if (!this.move_finder.can_kill_chain()) {
+            this.end_turn();
+        }
     }
 
     queen_promotion_check () {
