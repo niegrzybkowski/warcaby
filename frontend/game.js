@@ -120,6 +120,14 @@ class PersistentBoardState {
         }
     }
 
+    for_each_pawn (callable) {
+        this.for_each_field((row_idx, column_idx, field) => {
+            if (field.pawn) {
+                callable(row_idx, column_idx, field.pawn);
+            }
+        });
+    }
+
     switch_current_move () {
         if (this.current_move == "black") {
             this.current_move = "white";
@@ -389,24 +397,22 @@ class BoardRenderer {
     }
 
     render_pawns () {
-        this.persistent_board_state.for_each_field((row_idx, column_idx, field) => {
-            if (field.pawn) {
-                let pawn_button = document.createElement("button");
-                
-                if (field.pawn.queen) {
-                    pawn_button.innerHTML = "Q";
-                }
-
-                if (field.pawn.color == "white") {
-                    pawn_button.setAttribute("class", "pawn-white");
-                }
-                else {
-                    pawn_button.setAttribute("class", "pawn-black");
-                }
-
-                this.cells[row_idx + "_" + column_idx].appendChild(pawn_button);
-                this.pawns[row_idx + "_" + column_idx] = pawn_button;
+        this.persistent_board_state.for_each_pawn((row_idx, column_idx, pawn) => {
+            let pawn_button = document.createElement("button");
+            
+            if (pawn.queen) {
+                pawn_button.innerHTML = "Q"; // TODO: Proper styling
             }
+
+            if (pawn.color == "white") {
+                pawn_button.setAttribute("class", "pawn-white");
+            }
+            else {
+                pawn_button.setAttribute("class", "pawn-black");
+            }
+
+            this.cells[row_idx + "_" + column_idx].appendChild(pawn_button);
+            this.pawns[row_idx + "_" + column_idx] = pawn_button;
         });
     }
 
@@ -607,14 +613,12 @@ class BoardController {
     }
 
     install_select_callbacks(controller) {
-        controller.persistent_board_state.for_each_field((row_idx, column_idx, field) => {
-            if (field.pawn) {
-                controller.board_renderer.install_select_callback(row_idx, column_idx, () => {
-                    controller.select_pawn(row_idx, column_idx);
-                    controller.board_renderer.render();
-                    controller.install_all_callbacks();
-                });
-            }
+        controller.persistent_board_state.for_each_pawn((row_idx, column_idx, pawn) => {
+            controller.board_renderer.install_select_callback(row_idx, column_idx, () => {
+                controller.select_pawn(row_idx, column_idx);
+                controller.board_renderer.render();
+                controller.install_all_callbacks();
+            });
         });
     }
 
@@ -710,11 +714,11 @@ class BoardController {
         let is_black_winner = true;
         let is_white_winner =  true;
 
-        this.persistent_board_state.for_each_field((_r, _c, field) => {
-            if (field.pawn && field.pawn.color == "white") {
+        this.persistent_board_state.for_each_pawn((_r, _c, pawn) => {
+            if (pawn.color == "white") {
                 is_black_winner = false;
             }
-            if (field.pawn && field.pawn.color == "black") {
+            if (pawn.color == "black") {
                 is_white_winner = false;
             }
         });
