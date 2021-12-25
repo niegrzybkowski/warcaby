@@ -144,6 +144,15 @@ class PersistentBoardState {
         return this.fields[idx_to_position(row_idx, column_idx)];
     }
 
+    is_game_over () {
+        if (this.winner == null) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+
     /**
      * Initialization functions
      */
@@ -595,6 +604,11 @@ class BoardController {
         this.move_finder = new MoveFinder(persistent_board_state, ephemeral_board_state);
     }
 
+    reload () {
+        this.board_renderer.render();
+        this.install_all_callbacks();
+    }
+
     install_all_callbacks() {
         let controller = this;
 
@@ -607,8 +621,7 @@ class BoardController {
         controller.persistent_board_state.for_each_pawn((row_idx, column_idx, pawn) => {
             controller.board_renderer.install_pawn_callback(row_idx, column_idx, () => {
                 controller.select_pawn(row_idx, column_idx);
-                controller.board_renderer.render();
-                controller.install_all_callbacks();
+                controller.reload();
             });
         });
     }
@@ -618,8 +631,7 @@ class BoardController {
             let [row_idx, column_idx] = split_positon(position);
             controller.board_renderer.install_move_indicator_callback(row_idx, column_idx, () => {
                 controller.move_pawn_to(row_idx, column_idx);
-                controller.board_renderer.render();
-                controller.install_all_callbacks();
+                controller.reload();
             });
         }
     }
