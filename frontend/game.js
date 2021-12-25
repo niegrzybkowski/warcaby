@@ -184,14 +184,14 @@ class PersistentBoardState {
 
     /** 
      * State I/O functions 
-     * Not yet implemented
      */
 
-    load_state(serialized_state) {
+    load_state (serialized_state) {
         let new_state = JSON.parse(serialized_state);
         this.configuration = new_state.configuration;
         this.fields = new_state.fields;
         this.current_move = new_state.current_move;
+        this.winner = new_state.winner;
     }
 
     dump_state () {
