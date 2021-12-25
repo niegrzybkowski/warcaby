@@ -239,7 +239,7 @@ class EphemeralBoardState {
 
 class BoardRenderer {
     /**
-     * Render state in DOM and control it
+     * Render internal state in DOM
      */
 
     /** @type {PersistentBoardState} */ persistent_board_state;
@@ -442,14 +442,6 @@ class BoardRenderer {
 
     render_killing_moves () {
         this.render_moves(this.ephemeral_board_state.killing_moves);
-    }
-
-    /**
-     * Updating functions, these change things in an already rendered table
-     */
-
-    update_last_move () {
-
     }
 
     /**
