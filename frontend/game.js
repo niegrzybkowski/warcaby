@@ -613,6 +613,18 @@ class MoveAction {
         this.from = from;
         this.to = to;
     }
+
+    static from_idx (from_row_idx, from_column_idx, to_row_idx, to_column_idx) {
+        return new MoveAction (
+            idx_to_position(from_row_idx, from_column_idx),
+            idx_to_position(to_row_idx, to_column_idx));
+    }
+
+    apply (persistent_board_state) {
+        let [from_row_idx, from_column_idx] = split_positon(action.from);
+        let [to_row_idx, to_column_idx] = split_positon(action.to);
+        persistent_board_state.move_pawn(from_row_idx, from_column_idx, to_row_idx, to_column_idx);
+    }
 }
 
 class KillAction {
@@ -625,6 +637,22 @@ class KillAction {
         this.from = from;
         this.kill = kill;
         this.to = to;
+    }
+
+    static from_idx (from_row_idx, from_column_idx, kill_row_idx, kill_column_idx, to_row_idx, to_column_idx) {
+        return new KillAction (
+            idx_to_position(from_row_idx, from_column_idx),
+            idx_to_position(kill_row_idx, kill_column_idx),
+            idx_to_position(to_row_idx, to_column_idx));
+    }
+
+    apply (persistent_board_state) {
+        let [from_row_idx, from_column_idx] = split_positon(action.from);
+        let [to_row_idx, to_column_idx] = split_positon(action.to);
+        persistent_board_state.move_pawn(from_row_idx, from_column_idx, to_row_idx, to_column_idx);
+
+        let [kill_row_idx, kill_column_idx] = split_positon(action.kill);
+        persistent_board_state.kill_pawn(kill_row_idx, kill_column_idx);
     }
 }
 
@@ -640,7 +668,22 @@ class Turn {
     }
 
     static from_JSON (serialized_turn) {
-        return JSON.parse(serialized_turn);
+        let turn = new Turn;
+        let turn_data = JSON.parse(serialized_turn);
+        turn.color = turn_data.color;
+        turn.actions = new Array;
+        for (action of turn_data.actions) {
+            let parsed_action;
+            if (action.type == "move") {
+                parsed_action = new MoveAction(action.from, action.to);
+            } else if (action.type == "kill") {
+                parsed_action = new KillAction(action.from, action.kill, action.to);
+            } else {
+                console.error("Incorrect action type");
+            }
+            turn.actions.push(parsed_action);
+        }
+        return turn;
     }
 }
 
@@ -662,22 +705,18 @@ class TurnManager {
         this.move_validator = new MoveFinder(persistent_board_state, this.simulated_ephemeral_state);
     }
 
-    apply_turn (turn) {
-        for (let action of turn.actions) {
-            if (action.type == "move" || action.type == "kill"){
-                let [from_row_idx, from_column_idx] = split_positon(action.from);
-                let [to_row_idx, to_column_idx] = split_positon(action.to);
-                this.persistent_board_state.move_pawn(from_row_idx, from_column_idx, to_row_idx, to_column_idx);
-            }
-            if (action.type == "kill") {
-                let [kill_row_idx, kill_column_idx] = split_positon(action.kill);
-                this.persistent_board_state.kill_pawn(kill_row_idx, kill_column_idx);
-            }
-        }
+    add_and_apply_action (action) {
+        this.add_action_to_pending_turn(action);
+        action.apply(this.persistent_board_state);
     }
 
-    apply_pending_turn () {
-        this.apply_turn(this.pending_turn);
+    // apply - to PersistentBoardState
+    // add   - to pending_turn
+
+    apply_turn (turn) {
+        for (let action of turn.actions) {
+            action.apply(this.persistent_board_state);
+        }
     }
 
     init_turn () {
@@ -694,9 +733,9 @@ class TurnManager {
         this.pending_turn.push(action);
     }
 
-    clear_pending () {
-        this.pending_turn = null;
-    }
+    /**
+     * Backup management
+     */
 
     backup_state () {
         this.start_of_turn_state = this.persistent_board_state.dump_state();
