@@ -80,17 +80,6 @@ class Pawn {
     }
 }
 
-class BoardStateBackup {
-    /**
-     * Least effort method to omit a field in JSON serialization...
-     */
-    state;
-
-    toJSON (){
-        return undefined;
-    }
-}
-
 class PersistentBoardState {
     /**
      * This class contains the serializable state of the game
@@ -106,8 +95,6 @@ class PersistentBoardState {
     last_move;
     /** @type {string} */
     winner;
-    /** @type {BoardStateBackup} */
-    backup;
 
     constructor(configuration) {
         this.configuration = configuration;
@@ -244,18 +231,6 @@ class PersistentBoardState {
 
     dump_state () {
         return JSON.stringify(this);
-    }
-
-    backup_state () {
-        this.backup.state = this.dump_state();
-    }
-
-    restore_state () {
-        this.load_state(this.backup.state);
-    }
-
-    delete_backup () {
-        this.backup.state = "";
     }
 }
 
@@ -680,6 +655,7 @@ class TurnManager {
     simulated_ephemeral_state;
 
     pending_turn;
+    start_of_turn_state;
 
     constructor (persistent_board_state) {
         this.persistent_board_state = persistent_board_state;
@@ -721,6 +697,14 @@ class TurnManager {
 
     clear_pending () {
         this.pending_turn = null;
+    }
+
+    backup_state () {
+        this.start_of_turn_state = this.persistent_board_state.dump_state();
+    }
+
+    restore_state () {
+        this.persistent_board_state.load_state(this.start_of_turn_state);
     }
 }
 
