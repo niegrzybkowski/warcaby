@@ -99,7 +99,6 @@ class PersistentBoardState {
     constructor(configuration) {
         this.configuration = configuration;
         this.initialize_board_state();
-        this.state_backup = new BoardStateBackup;
     }
 
     /**
@@ -749,6 +748,14 @@ class BoardController {
         });
     }
 
+    install_select_revert_callbacks(controller) {
+        let [row_idx, column_idx] = split_positon(controller.ephemeral_board_state.selected_pawn);
+        controller.board_renderer.install_pawn_callback(row_idx, column_idx, () => {
+            controller.select_revert_pawn(row_idx, column_idx);
+            controller.reload();
+        });
+    }
+
     install_move_callbacks(controller) {
         for (let [position, _value] of Object.entries(controller.ephemeral_board_state.legal_moves)) {
             let [row_idx, column_idx] = split_positon(position);
@@ -770,6 +777,7 @@ class BoardController {
                 controller.board_renderer.render();
                 if (controller.move_finder.can_kill_chain()) {
                     controller.install_kill_callbacks(controller);
+                    controller.install_select_revert_callbacks(controller);
                 } else {
                     controller.install_all_callbacks();
                 }
@@ -779,6 +787,8 @@ class BoardController {
 
     select_pawn(row_idx, column_idx) {
         let position = idx_to_position(row_idx, column_idx);
+
+        this.turn_manager.backup_state();
 
         if (this.persistent_board_state.current_move != this.persistent_board_state.fields[position].pawn.color) {
             return; // not current player's pawn
@@ -791,6 +801,14 @@ class BoardController {
             this.ephemeral_board_state.clear(); // normal selection
             this.ephemeral_board_state.selected_pawn = position;
             this.move_finder.find_moves();
+        }
+    }
+
+    select_revert_pawn (row_idx, column_idx) { // click on selected pawn while kill chaining to abort move
+        let position = idx_to_position(row_idx, column_idx);
+        if (this.ephemeral_board_state.selected_pawn == position) {
+            this.turn_manager.restore_state();
+            this.ephemeral_board_state.clear();
         }
     }
 
