@@ -5,8 +5,12 @@ table, th, td {
 
 th, td {
   border: 1px solid black;
+  min-width: 40px;
+  min-height: 40px;
   width: 40px;
   height: 40px;
+  max-width: 40px;
+  max-height: 40px;
   overflow: hidden;
   padding: 7px;
 }
