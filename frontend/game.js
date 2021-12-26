@@ -621,8 +621,8 @@ class MoveAction {
     }
 
     apply (persistent_board_state) {
-        let [from_row_idx, from_column_idx] = split_positon(action.from);
-        let [to_row_idx, to_column_idx] = split_positon(action.to);
+        let [from_row_idx, from_column_idx] = split_positon(this.from);
+        let [to_row_idx, to_column_idx] = split_positon(this.to);
         persistent_board_state.move_pawn(from_row_idx, from_column_idx, to_row_idx, to_column_idx);
     }
 }
@@ -647,11 +647,11 @@ class KillAction {
     }
 
     apply (persistent_board_state) {
-        let [from_row_idx, from_column_idx] = split_positon(action.from);
-        let [to_row_idx, to_column_idx] = split_positon(action.to);
+        let [from_row_idx, from_column_idx] = split_positon(this.from);
+        let [to_row_idx, to_column_idx] = split_positon(this.to);
         persistent_board_state.move_pawn(from_row_idx, from_column_idx, to_row_idx, to_column_idx);
 
-        let [kill_row_idx, kill_column_idx] = split_positon(action.kill);
+        let [kill_row_idx, kill_column_idx] = split_positon(this.kill);
         persistent_board_state.kill_pawn(kill_row_idx, kill_column_idx);
     }
 }
@@ -660,7 +660,7 @@ class Turn {
     color;
     actions;
 
-    static new_blank (color, type) {
+    static new_blank (color) {
         let turn = new Turn;
         turn.color = color;
         turn.actions = new Array;
@@ -720,7 +720,7 @@ class TurnManager {
     }
 
     init_turn () {
-        this.pending_turn = new Turn(
+        this.pending_turn = Turn.new_blank(
             this.persistent_board_state.current_move,
             new Array
         );
@@ -730,7 +730,7 @@ class TurnManager {
         if (!this.pending_turn) {
             this.init_turn();
         }
-        this.pending_turn.push(action);
+        this.pending_turn.actions.push(action);
     }
 
     /**
@@ -853,11 +853,8 @@ class BoardController {
 
     move_pawn_to (move_row_idx, move_column_idx) {
         let [selected_row_idx, selected_column_idx] = split_positon(this.ephemeral_board_state.selected_pawn);
-        let selected_pawn = this.persistent_board_state.get_pawn_at(selected_row_idx, selected_column_idx);
-        
-        this.persistent_board_state.set_pawn_at(move_row_idx, move_column_idx, selected_pawn);
-        this.persistent_board_state.set_pawn_at(selected_row_idx, selected_column_idx, null);
-
+        let action = MoveAction.from_idx(selected_row_idx, selected_column_idx, move_row_idx, move_column_idx);
+        this.turn_manager.add_and_apply_action(action);
         this.end_turn();
     }
 
