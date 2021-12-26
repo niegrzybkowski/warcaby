@@ -26,7 +26,7 @@ def local(req: HttpRequest):
         "game/game_local.html", 
         context={"config": config}))
 
-def test(req: HttpRequest):
+def new(req: HttpRequest):
     print(req.session.session_key)
     return HttpResponse("Hi!")
 
