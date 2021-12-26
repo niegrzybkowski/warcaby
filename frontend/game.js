@@ -21,8 +21,6 @@ window.onload = function() {
     );    
     br.render();
     bc.install_all_callbacks();
-
-    return [bs, es, br, bc];
 }
 
 function idx_to_position (row_idx, column_idx) {
@@ -628,6 +626,10 @@ class MoveAction {
         let [to_row_idx, to_column_idx] = split_positon(this.to);
         persistent_board_state.move_pawn(from_row_idx, from_column_idx, to_row_idx, to_column_idx);
     }
+
+    validate (simulator) {
+        return this.to in simulator.ephemeral_board_state.legal_moves;
+    }
 }
 
 class KillAction {
@@ -656,6 +658,10 @@ class KillAction {
 
         let [kill_row_idx, kill_column_idx] = split_positon(this.kill);
         persistent_board_state.kill_pawn(kill_row_idx, kill_column_idx);
+    }
+
+    validate (simulator) {
+        return this.to in simulator.ephemeral_board_state.killing_moves;
     }
 }
 
@@ -696,8 +702,10 @@ class TurnManager {
      */
 
     persistent_board_state;
-    move_validator;
+
+    move_simulator;
     simulated_ephemeral_state;
+    simulated_persistent_state;
 
     pending_turn;
     start_of_turn_state;
@@ -705,7 +713,8 @@ class TurnManager {
     constructor (persistent_board_state) {
         this.persistent_board_state = persistent_board_state;
         this.simulated_ephemeral_state = new EphemeralBoardState();
-        this.move_validator = new MoveFinder(persistent_board_state, this.simulated_ephemeral_state);
+        this.simulated_persistent_state = new PersistentBoardState(persistent_board_state.configuration)
+        this.move_simulator = new MoveFinder(this.simulated_persistent_state, this.simulated_ephemeral_state);
     }
 
     add_and_apply_action (action) {
@@ -734,6 +743,55 @@ class TurnManager {
             this.init_turn();
         }
         this.pending_turn.actions.push(action);
+    }
+
+    init_simulation () {
+        this.simulated_persistent_state.load_state(this.persistent_board_state.dump_state());
+        this.simulated_ephemeral_state.clear();
+    }
+
+    is_turn_valid (turn) {
+        this.init_simulation();
+        return this.is_side_valid(turn.color) &&
+            this.is_at_least_one_action(turn.actions) &&
+            this.is_action_combination_valid(turn.actions) &&
+            this.is_all_actions_valid(turn.actions);
+    }
+
+    is_side_valid (turn_move) {
+        return turn_move == this.simulated_persistent_state.current_move;
+    }
+
+    is_at_least_one_action (actions) {
+        return actions.length >= 1;
+    }
+
+    is_action_combination_valid (actions) {
+        let first_action_type = actions[0].type;
+        for (let action of actions){
+            if (action.type != first_action_type) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    is_all_actions_valid (actions) {
+        for (let action of actions) {
+            if (this.is_action_valid(action)) {
+                action.apply(this.simulated_persistent_state);
+            } 
+            else {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    is_action_valid (action) {
+        this.simulated_ephemeral_state.selected_pawn = action.from;
+        this.move_simulator.find_moves();
+        return action.validate(this.move_simulator);
     }
 
     /**
