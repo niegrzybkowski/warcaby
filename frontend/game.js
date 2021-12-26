@@ -1,5 +1,8 @@
+let bs;
+let bc;
+
 window.onload = function() {
-    let bs = new PersistentBoardState(
+    bs = new PersistentBoardState(
         BoardConfiguration.default_config
     );
     let es = new EphemeralBoardState();
@@ -8,7 +11,7 @@ window.onload = function() {
         es,
         document.getElementById("game_board_container")
     );
-    let bc = new BoardController(
+    bc = new BoardController(
         bs,
         es,
         br
@@ -253,14 +256,6 @@ class PersistentBoardState {
 
     delete_backup () {
         this.backup.state = "";
-    }
-
-    load_last_move () {
-
-    }
-
-    dump_last_move() {
-
     }
 }
 
@@ -635,6 +630,100 @@ class MoveFinder {
     }
 }
 
+class MoveAction {
+    type = "move";
+    from;
+    to;
+
+    constructor (from, to) {
+        this.from = from;
+        this.to = to;
+    }
+}
+
+class KillAction {
+    type = "kill";
+    from;
+    kill;
+    to;
+
+    constructor (from, kill, to) {
+        this.from = from;
+        this.kill = kill;
+        this.to = to;
+    }
+}
+
+class Turn {
+    color;
+    actions;
+
+    static new_blank (color, type) {
+        let turn = new Turn;
+        turn.color = color;
+        turn.actions = new Array;
+        return turn;
+    }
+
+    static from_JSON (serialized_turn) {
+        return JSON.parse(serialized_turn);
+    }
+}
+
+class TurnManager {
+    /**
+     * Validates, stores, applies turns
+     */
+
+    persistent_board_state;
+    move_validator;
+    simulated_ephemeral_state;
+
+    pending_turn;
+
+    constructor (persistent_board_state) {
+        this.persistent_board_state = persistent_board_state;
+        this.simulated_ephemeral_state = new EphemeralBoardState();
+        this.move_validator = new MoveFinder(persistent_board_state, this.simulated_ephemeral_state);
+    }
+
+    apply_turn (turn) {
+        for (let action of turn.actions) {
+            if (action.type == "move" || action.type == "kill"){
+                let [from_row_idx, from_column_idx] = split_positon(action.from);
+                let [to_row_idx, to_column_idx] = split_positon(action.to);
+                this.persistent_board_state.move_pawn(from_row_idx, from_column_idx, to_row_idx, to_column_idx);
+            }
+            if (action.type == "kill") {
+                let [kill_row_idx, kill_column_idx] = split_positon(action.kill);
+                this.persistent_board_state.kill_pawn(kill_row_idx, kill_column_idx);
+            }
+        }
+    }
+
+    apply_pending_turn () {
+        this.apply_turn(this.pending_turn);
+    }
+
+    init_turn () {
+        this.pending_turn = new Turn(
+            this.persistent_board_state.current_move,
+            new Array
+        );
+    }
+
+    add_action_to_pending_turn (action) {
+        if (!this.pending_turn) {
+            this.init_turn();
+        }
+        this.pending_turn.push(action);
+    }
+
+    clear_pending () {
+        this.pending_turn = null;
+    }
+}
+
 class BoardController {
     /**
      * Game logic
@@ -644,12 +733,14 @@ class BoardController {
     /** @type {EphemeralBoardState} */ ephemeral_board_state;
     /** @type {BoardRenderer} */ board_renderer;
     /** @type {MoveFinder} */ move_finder;
+    /** @type {TurnManager} */ turn_manager;
 
     constructor (persistent_board_state, ephemeral_board_state, board_renderer) {
         this.persistent_board_state = persistent_board_state;
         this.ephemeral_board_state = ephemeral_board_state;
         this.board_renderer = board_renderer;
         this.move_finder = new MoveFinder(persistent_board_state, ephemeral_board_state);
+        this.turn_manager = new TurnManager(persistent_board_state);
     }
 
     reload () {
