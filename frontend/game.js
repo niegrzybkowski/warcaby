@@ -696,6 +696,15 @@ class Turn {
     }
 }
 
+/**
+ * zwykły
+ * '{"color":"white","actions":[{"type":"move","from":"6_5","to":"5_4"}]}'
+ * bicie
+ * '{"color":"black","actions":[{"type":"kill","from":"2_1","kill":"3_2","to":"4_3"},{"type":"kill","from":"4_3","kill":"5_4","to":"6_5"}]}'
+ * damka
+ * '{"color":"white","actions":[{"type":"move","from":"1_4","to":"4_1"}]}'
+ */
+
 class TurnManager {
     /**
      * Validates, stores, applies turns
