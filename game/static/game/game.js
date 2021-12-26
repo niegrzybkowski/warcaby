@@ -4,8 +4,10 @@ let start_of_game;
 let turns = new Array;
 
 window.onload = function() {
+    let board_configuration = JSON.parse(document.getElementById("board_configuration").textContent);
+
     bs = new PersistentBoardState(
-        BoardConfiguration.default_config
+        board_configuration
     );
     start_of_game = bs.dump_state();
     let es = new EphemeralBoardState();
@@ -19,8 +21,7 @@ window.onload = function() {
         es,
         br
     );    
-    br.render();
-    bc.install_all_callbacks();
+    bc.reload();
 }
 
 function idx_to_position (row_idx, column_idx) {
