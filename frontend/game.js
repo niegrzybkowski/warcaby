@@ -99,6 +99,8 @@ class PersistentBoardState {
     last_move;
     /** @type {string} */
     winner;
+    /** @type {number} */
+    turn_number = 0;
 
     constructor(configuration) {
         this.configuration = configuration;
@@ -128,6 +130,7 @@ class PersistentBoardState {
     }
 
     switch_current_move () {
+        this.turn_number += 1;
         if (this.current_move == "black") {
             this.current_move = "white";
         } else {
@@ -671,11 +674,13 @@ class KillAction {
 class Turn {
     color;
     actions;
+    id;
 
-    static new_blank (color) {
+    static new_blank (color, id) {
         let turn = new Turn;
         turn.color = color;
         turn.actions = new Array;
+        turn.id = id;
         return turn;
     }
 
@@ -695,17 +700,18 @@ class Turn {
             }
             turn.actions.push(parsed_action);
         }
+        turn.id = turn_data.id;
         return turn;
     }
 }
 
 /**
  * zwykły
- * '{"color":"white","actions":[{"type":"move","from":"6_5","to":"5_4"}]}'
+ * '{"id": 13, "color":"white","actions":[{"type":"move","from":"6_5","to":"5_4"}]}'
  * bicie
- * '{"color":"black","actions":[{"type":"kill","from":"2_1","kill":"3_2","to":"4_3"},{"type":"kill","from":"4_3","kill":"5_4","to":"6_5"}]}'
+ * '{"id": 13, "color":"black","actions":[{"type":"kill","from":"2_1","kill":"3_2","to":"4_3"},{"type":"kill","from":"4_3","kill":"5_4","to":"6_5"}]}'
  * damka
- * '{"color":"white","actions":[{"type":"move","from":"1_4","to":"4_1"}]}'
+ * '{"id": 13, "color":"white","actions":[{"type":"move","from":"1_4","to":"4_1"}]}'
  */
 
 class TurnManager {
@@ -746,7 +752,7 @@ class TurnManager {
     init_turn () {
         this.pending_turn = Turn.new_blank(
             this.persistent_board_state.current_move,
-            new Array
+            this.persistent_board_state.turn_number + 1
         );
     }
 
