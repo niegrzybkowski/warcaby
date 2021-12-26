@@ -708,6 +708,7 @@ class TurnManager {
     add_and_apply_action (action) {
         this.add_action_to_pending_turn(action);
         action.apply(this.persistent_board_state);
+        console.log(action);
     }
 
     // apply - to PersistentBoardState
@@ -828,6 +829,7 @@ class BoardController {
         let position = idx_to_position(row_idx, column_idx);
 
         this.turn_manager.backup_state();
+        this.turn_manager.init_turn();
 
         if (this.persistent_board_state.current_move != this.persistent_board_state.fields[position].pawn.color) {
             return; // not current player's pawn
@@ -860,12 +862,14 @@ class BoardController {
 
     kill_pawn (pawn_row_idx, pawn_column_idx, landing_row_idx, landing_column_idx) {
         let [selected_row_idx, selected_column_idx] = this.ephemeral_board_state.get_selected_idx();
-        let selected_pawn = this.persistent_board_state.get_pawn_at(selected_row_idx, selected_column_idx);
 
-        this.persistent_board_state.set_pawn_at(pawn_row_idx, pawn_column_idx, null);
-        this.persistent_board_state.set_pawn_at(landing_row_idx, landing_column_idx, selected_pawn);
-        this.persistent_board_state.set_pawn_at(selected_row_idx, selected_column_idx, null);
+        let action = KillAction.from_idx(
+            selected_row_idx, selected_column_idx,
+            pawn_row_idx, pawn_column_idx, 
+            landing_row_idx, landing_column_idx
+        );
 
+        this.turn_manager.add_and_apply_action(action);
 
         this.ephemeral_board_state.clear();
         this.ephemeral_board_state.selected_pawn = idx_to_position(landing_row_idx, landing_column_idx);
@@ -911,6 +915,7 @@ class BoardController {
     }
 
     end_turn () {
+        console.log(this.turn_manager.pending_turn);
         this.persistent_board_state.switch_current_move();
         this.ephemeral_board_state.clear();
         
