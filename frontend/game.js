@@ -167,6 +167,17 @@ class PersistentBoardState {
         }
     }
 
+    move_pawn (from_row_idx, from_column_idx, to_row_idx, to_column_idx) {
+        let pawn = this.get_pawn_at(from_row_idx, from_column_idx);
+
+        this.set_pawn_at(to_row_idx, to_column_idx, pawn);
+        this.set_pawn_at(from_row_idx, from_column_idx, null);
+    }
+
+    kill_pawn (kill_row_idx, kill_column_idx) {
+        this.set_pawn_at(kill_row_idx, kill_column_idx, null);
+    }
+
     /**
      * Initialization functions
      */
