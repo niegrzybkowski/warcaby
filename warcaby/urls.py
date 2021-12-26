@@ -21,7 +21,8 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     path('', views.home, name="home"),
-    path('play/', include('game.urls')),
+    path('local/', include('local.urls')),
     path('list/', include('game_list.urls')),
+    # path('online/', include('online.urls')), # <- TODO: Target
     path('admin/', admin.site.urls),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

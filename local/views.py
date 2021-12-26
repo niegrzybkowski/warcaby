@@ -27,5 +27,6 @@ def local(req: HttpRequest):
         context={"config": config}))
 
 def test(req: HttpRequest):
+    print(req.session.session_key)
     return HttpResponse("Hi!")
 
