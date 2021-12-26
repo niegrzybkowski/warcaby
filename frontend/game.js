@@ -209,16 +209,39 @@ class PersistentBoardState {
      * State I/O functions 
      */
 
+    validate_incoming_state (new_state) {
+        return "configuration" in new_state &&
+               "fields" in new_state && 
+               "current_move" in new_state;
+    }
+
     load_state (serialized_state) {
         let new_state = JSON.parse(serialized_state);
-        this.configuration = new_state.configuration;
-        this.fields = new_state.fields;
-        this.current_move = new_state.current_move;
-        this.winner = new_state.winner;
+        if (this.validate_incoming_state(new_state)) {
+            this.configuration = new_state.configuration;
+            this.fields = new_state.fields;
+            this.current_move = new_state.current_move;
+            this.winner = new_state.winner;
+        }
+        else {
+            console.error("Tried loading invalid state");
+        }
     }
 
     dump_state () {
         return JSON.stringify(this);
+    }
+
+    backup_state () {
+        this.backup.state = this.dump_state();
+    }
+
+    restore_state () {
+        this.load_state(this.backup.state);
+    }
+
+    delete_backup () {
+        this.backup.state = "";
     }
 
     load_last_move () {
