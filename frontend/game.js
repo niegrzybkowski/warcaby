@@ -1,10 +1,13 @@
 let bs;
 let bc;
+let start_of_game;
+let turns = new Array;
 
 window.onload = function() {
     bs = new PersistentBoardState(
         BoardConfiguration.default_config
     );
+    start_of_game = bs.dump_state();
     let es = new EphemeralBoardState();
     let br = new BoardRenderer(
         bs,
@@ -708,7 +711,6 @@ class TurnManager {
     add_and_apply_action (action) {
         this.add_action_to_pending_turn(action);
         action.apply(this.persistent_board_state);
-        console.log(action);
     }
 
     // apply - to PersistentBoardState
@@ -915,7 +917,7 @@ class BoardController {
     }
 
     end_turn () {
-        console.log(this.turn_manager.pending_turn);
+        turns.push(this.turn_manager.pending_turn); //temp
         this.persistent_board_state.switch_current_move();
         this.ephemeral_board_state.clear();
         
