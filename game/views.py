@@ -17,15 +17,14 @@ IMMUTABLE_BOARD_CONFIG = {
 def local(req: HttpRequest):
     config = DEFAULT_BOARD_CONFIG.copy()
     for key in config.keys():
-        if key in req.GET:
+        if key in req.GET: # TODO: GET is temporary, change to POST once config site is ready
             config[key] = req.GET[key]
     
     config |= IMMUTABLE_BOARD_CONFIG
-    return HttpResponse(
-        render(
-            req, 
-            "game/game_local.html", 
-            context={"config": config}))
+    return HttpResponse(render(
+        req, 
+        "game/game_local.html", 
+        context={"config": config}))
 
 def test(req: HttpRequest):
     return HttpResponse("Hi!")
