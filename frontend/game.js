@@ -77,6 +77,17 @@ class Pawn {
     }
 }
 
+class BoardStateBackup {
+    /**
+     * Least effort method to omit a field in JSON serialization...
+     */
+    state;
+
+    toJSON (){
+        return undefined;
+    }
+}
+
 class PersistentBoardState {
     /**
      * This class contains the serializable state of the game
@@ -92,10 +103,13 @@ class PersistentBoardState {
     last_move;
     /** @type {string} */
     winner;
+    /** @type {BoardStateBackup} */
+    backup;
 
     constructor(configuration) {
         this.configuration = configuration;
         this.initialize_board_state();
+        this.state_backup = new BoardStateBackup;
     }
 
     /**
