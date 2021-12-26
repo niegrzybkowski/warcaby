@@ -27,6 +27,10 @@ def local(req: HttpRequest):
         context={"config": config}))
 
 def new(req: HttpRequest):
-    print(req.session.session_key)
+    # demo do session_key, jak robimy bez rejestracji, to session_key po prostu zastępuje usera
+    if req.session.test_cookie_worked():
+        print(req.session.session_key)
+    else:
+        req.session.set_test_cookie()
     return HttpResponse("Hi!")
 
