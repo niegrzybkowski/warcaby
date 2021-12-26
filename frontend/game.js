@@ -781,14 +781,14 @@ class BoardController {
         let position = idx_to_position(row_idx, column_idx);
 
         if (this.persistent_board_state.current_move != this.persistent_board_state.fields[position].pawn.color) {
-            return;
+            return; // not current player's pawn
         }
 
         if (this.ephemeral_board_state.selected_pawn == position) {
-            this.ephemeral_board_state.clear();
+            this.ephemeral_board_state.clear(); // clicked on an already selected pawn -> deselect
         }
         else {
-            this.ephemeral_board_state.clear();
+            this.ephemeral_board_state.clear(); // normal selection
             this.ephemeral_board_state.selected_pawn = position;
             this.move_finder.find_moves();
         }
