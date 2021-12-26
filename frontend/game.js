@@ -41,6 +41,8 @@ class BoardConfiguration {
     starting_rows;
     /** @type {string} */
     starting_player;
+
+    controllable_sides;
      
     /**
      * 
@@ -48,13 +50,14 @@ class BoardConfiguration {
      * @param {number} starting_rows 
      * @param {string} starting_player 
      */
-    constructor (size, starting_rows, starting_player) {
+    constructor (size, starting_rows, starting_player, controllable_sides) {
         this.size = size;
         this.starting_rows = starting_rows;
         this.starting_player = starting_player;
+        this.controllable_sides = controllable_sides;
     }
 
-    static default_config = new BoardConfiguration(8, 3, "white");
+    static default_config = new BoardConfiguration(8, 3, "white", ["white", "black"]);
 }
 
 class Field {
@@ -900,10 +903,15 @@ class BoardController {
         this.turn_manager.backup_state();
         this.turn_manager.init_turn();
 
-        if (this.persistent_board_state.current_move != this.persistent_board_state.fields[position].pawn.color) {
-            return; // not current player's pawn
+        let pawn = this.persistent_board_state.get_pawn_at(row_idx, column_idx);
+        
+        if (pawn.color != this.persistent_board_state.current_move) {
+            return;
         }
-
+        if (!this.persistent_board_state.configuration.controllable_sides.includes(pawn.color)){
+            console.log("cant control this one")
+            return;
+        }
         if (this.ephemeral_board_state.selected_pawn == position) {
             this.ephemeral_board_state.clear(); // clicked on an already selected pawn -> deselect
         }
