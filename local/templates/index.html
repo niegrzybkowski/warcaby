@@ -1,0 +1,13 @@
+{% block content %}
+<div class="wrapper">
+  <h1>Wybierz numer pokoju i zacznij grać w warcaby</h1>
+  <form method="POST">
+    {% csrf_token %}
+    <div class='form-control'>
+      <label for="room">Room id</label>
+      <input id="room" type="text" name="room_code" required />
+    </div>
+    <input type="submit" class="button" value="Start Game" />
+</div>
+</form>
+{% endblock content %}

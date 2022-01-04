@@ -18,6 +18,8 @@ from django.urls import path, include
 from home import views
 from django.conf import settings
 from django.conf.urls.static import static
+from home.views import home
+from home.views import game
 
 urlpatterns = [
     path('', views.home, name="home"),
@@ -25,4 +27,6 @@ urlpatterns = [
     path('list/', include('game_list.urls')),
     # path('online/', include('online.urls')), # <- TODO: Target
     path('admin/', admin.site.urls),
+    path('', home),
+    path('play/<room_code>', game),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
