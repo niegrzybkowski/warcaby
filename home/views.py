@@ -17,6 +17,12 @@ def home(request):
                 return render(request, "index2.html")
         elif request.POST.get("konfiguracja"):
             return render(request, "configuration.html")
+        elif request.POST.get("create_room"):
+            room_code = request.POST.get("room_code")
+            return redirect(
+                '/play/%s?'
+                % (room_code)
+            )
     return render(request, "index.html", {})
 
 def game(request, room_code):
