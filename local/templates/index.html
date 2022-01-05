@@ -14,7 +14,11 @@
     online
   </label><br>
     </div>
-    <input type="submit" class="button" value="Gram" />
+    <input type="submit" name="gra" class="button" value="Gram" />
+</form>
+  <form method="POST">
+    {% csrf_token %}
+    <input type="submit" name="konfiguracja" class="button" value="Zmień konfigurację" />
 </form>
 </div>
 {% endblock content %}
