@@ -1,13 +1,20 @@
 {% block content %}
 <div class="wrapper">
-  <h1>Wybierz numer pokoju i zacznij grać w warcaby</h1>
+  <h1>Wybierz w jaki sposób chcesz grać w warcaby</h1>
   <form method="POST">
     {% csrf_token %}
     <div class='form-control'>
-      <label for="room">Room id</label>
-      <input id="room" type="text" name="room_code" required />
+      <label>Tryb gry:</label><br>
+      <label>
+      <input type="radio" name="tryb" value="lokalnie" required>
+    lokalnie
+  </label><br>
+       <label>
+      <input type="radio" name="tryb" value="online" required>
+    online
+  </label><br>
     </div>
-    <input type="submit" class="button" value="Start Game" />
-</div>
+    <input type="submit" class="button" value="Gram" />
 </form>
+</div>
 {% endblock content %}

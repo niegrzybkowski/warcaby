@@ -9,11 +9,11 @@ from django.http import Http404
 
 def home(request):
     if request.method == "POST":
-        tryb = request.POST.get("tryb")
-        if(tryb == "lokalnie"):
-            return render(request, "game/game_local.html")
-        if (tryb == "online"):
-            return render(request, "index2.html")
+        room_code = request.POST.get("room_code")
+        return redirect(
+            '/play/%s?'
+            % (room_code)
+        )
     return render(request, "index.html", {})
 
 def game(request, room_code):
