@@ -1,10 +1,17 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
-
-</body>
-</html>
+{% block content %}
+<div class="wrapper">
+  <h1>Wybierz nową konfigurację</h1>
+  <form method="POST">
+    {% csrf_token %}
+    <div class='form-control'>
+      <label for="size">Rozmiar planszy (liczba wierszy)</label>
+      <input id="size" type="text" name="size" value="10" required />
+    </div>
+      <div class='form-control'>
+      <label for="starting_rows">Ile rzędów ma mieć pionki</label>
+      <input id="starting_rows" type="text" name="starting_rows" value="3" required />
+    </div>
+    <input type="submit" name="gra" class="button" value="Akceptuj" />
+</form>
+</div>
+{% endblock content %}
