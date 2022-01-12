@@ -24,7 +24,6 @@ from home.views import game
 urlpatterns = [
     path('', views.home, name="home"),
     path('local/', include('local.urls')),
-    path('list/', include('game_list.urls')),
     # path('online/', include('online.urls')), # <- TODO: Target
     path('admin/', admin.site.urls),
     path('', home),
