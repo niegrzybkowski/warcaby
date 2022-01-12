@@ -15,17 +15,19 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from home import views
+from local import views
 from django.conf import settings
 from django.conf.urls.static import static
-from home.views import home
-from home.views import game
+from local.views import local
+from local.views import game
 
 urlpatterns = [
-    path('', views.home, name="home"),
+    path('', views.local, name="local"),
     path('local/', include('local.urls')),
     # path('online/', include('online.urls')), # <- TODO: Target
     path('admin/', admin.site.urls),
-    path('', home),
+    path('', local),
     path('play/<room_code>', game),
+    path('new/', views.new),
+    path('play/', views.local)
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
