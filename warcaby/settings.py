@@ -39,8 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'local',
     'game_list',
-    'channels',
-    'game'
+    'channels'
 ]
 
 MIDDLEWARE = [
