@@ -38,24 +38,84 @@ def local_game(req: HttpRequest):
         "warcaby/local/game.html", 
         context={"config": config}))
 
-def online_main(req):
-    pass
 
+def online_main(req):
+    return render(req, "warcaby/online/main.html")
+
+# TODO: do zamienienia na model
+TEST_GAME_LIST = {
+     "game_list": [ 
+        {
+            "room_name": "aaa",
+            "is_protected": True,
+            "board_configuration": {
+                "size":8,
+                "starting_rows": 2,
+                "starting_player": "black"
+            },
+            "multiplayer_configuration": {
+                "white_player": "SESSION ID GRACZA",
+                "black_player": "SESSION ID GRACZA"
+            }
+        },
+        {
+            "room_name": "dwa",
+            "is_protected": False,
+            "board_configuration" : DEFAULT_BOARD_CONFIG,
+            "multiplayer_configuration": {
+                "white_player": "SESSION ID GRACZA",
+                "black_player": "SESSION ID GRACZA"
+            }
+        },
+        {
+            "room_name": "trzy",
+            "is_protected": False,
+            "board_configuration": DEFAULT_BOARD_CONFIG,
+            "multiplayer_configuration": {
+                "white_player": "SESSION ID GRACZA",
+                "black_player": "SESSION ID GRACZA"
+            }
+        }
+    ]
+}
 
 def online_list(req):
-    pass
+    game_list = TEST_GAME_LIST
+    return render(req, "warcaby/online/list.html", game_list)
 
 
 def online_new(req):
     pass
 
 
-def online_lobby(req, room_id):
-    pass
+def online_lobby(req: HttpRequest, room_id):
+    game_list = TEST_GAME_LIST["game_list"]
+    for room in game_list:
+        if room["room_name"] == room_id:
+            control = {}
+            if "id_gracza" in req.session:
+                if room["multiplayer_configuration"]["white_player"] == req.session["id_gracza"]:
+                    control = {"controlling": "white"}
+                elif room["multiplayer_configuration"]["black_player"] == req.session["id_gracza"]:
+                    control = {"controlling": "black"}
+                else:
+                    # redirect, wynocha
+                    pass
+            
+            return render(
+                req, "warcaby/online/lobby.html",
+                room | control
+            )
+    return redirect("/online/list", error="game_not_found")
+    
 
 
 def online_game(req, room_id):
-    pass
+    game_list = TEST_GAME_LIST["game_list"]
+    for room in game_list:
+        if room["room_name"] == room_id:
+            return render(req, "warcaby/online/game.html", room | {"config" : DEFAULT_BOARD_CONFIG | IMMUTABLE_BOARD_CONFIG})
+    return redirect("/online/list", error="game_not_found")
 
 
 # def new(req: HttpRequest):

@@ -1,17 +1,12 @@
-<!DOCTYPE html>
-<html lang="pl">
-<head>
+{% extends 'warcaby/base.html' %}
+{% block head %}
     {% load static %}
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" type="text/css" href={% static 'warcaby/game_board.css' %}>
     {{ config | json_script:"board_configuration" }}
     <script src={% static 'warcaby/game.js'%}></script>
-    <title>Warcaby</title>
-</head>
-<body>
+{% endblock head %}
+
+{% block main %}
     <h1>Warcaby Statyczne</h1>
     <div id="game_board_container"></div>
-</body>
-</html>
+{% endblock main %}
