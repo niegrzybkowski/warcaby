@@ -1,0 +1,13 @@
+{% extends 'warcaby/base.html' %}
+
+{% block head %}
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href={% static 'warcaby/game_board.css' %}>
+    {{ config | json_script:"board_configuration" }}
+    <script src={% static 'warcaby/game.js'%}></script>
+{% endblock head %}
+
+{% block main %}
+    <h1>Warcaby Online: {{room_name}} </h1>
+    <div id="game_board_container"></div>
+{% endblock main %}

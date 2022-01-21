@@ -1,0 +1,15 @@
+{% extends 'warcaby/base.html' %}
+{% block main %}
+<h1> Warcaby lista gier</h1>
+<ul>
+    {% for game in game_list %}
+    {# TODO: Tabelka pewnie ładniej by wyglądała #}
+        <li> 
+            {{game.room_name}}, 
+            {% if game.is_protected %}PIN,{% else %}{% endif %}
+            <a href={{"/online/room/" | add:game.room_name | add:"/lobby"}}> JOIN</a>
+        </li>
+    {% endfor %}
+</ul>
+{% endblock main %}
+
