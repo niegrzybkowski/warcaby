@@ -1,12 +1,14 @@
 {% extends 'warcaby/base.html' %}
 
 {% block main %}
+<!--{% load static %}
+<script src="{% static 'warcaby/config.js' %}"></script> -->
 <h1> Konfiguracja </h1>
-<form action="/local/play" method="GET">
+<form action="/local/play" method="GET" onsubmit="return validateForm(event)">
     <div class="config-form">
         <div>
             <label for="size">Rozmiar planszy</label>
-            <input type="number" name="size" value="8" min="4" step="1" id="size">
+            <input type="number" name="size" value="8" min="4" step="1" id="c">
         </div>
         <div>
             <label for="starting_rows">Liczba rzędów pionków</label>
