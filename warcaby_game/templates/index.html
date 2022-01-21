@@ -1,0 +1,24 @@
+{% block content %}
+<div class="wrapper">
+  <h1>Wybierz w jaki sposób chcesz grać w warcaby</h1>
+  <form method="POST">
+    {% csrf_token %}
+    <div class='form-control'>
+      <label>Tryb gry:</label><br>
+      <label>
+      <input type="radio" name="tryb" value="lokalnie" required>
+    lokalnie
+  </label><br>
+       <label>
+      <input type="radio" name="tryb" value="online" required>
+    online
+  </label><br>
+    </div>
+    <input type="submit" name="gra" class="button" value="Gram" />
+</form>
+  <form method="POST">
+    {% csrf_token %}
+    <input type="submit" name="konfiguracja" class="button" value="Zmień konfigurację" />
+</form>
+</div>
+{% endblock content %}

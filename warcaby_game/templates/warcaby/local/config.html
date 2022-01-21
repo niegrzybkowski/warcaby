@@ -1,0 +1,30 @@
+{% extends 'warcaby/base.html' %}
+
+{% block main %}
+<h1> Konfiguracja </h1>
+<form action="/local/play" method="GET">
+    <div class="config-form">
+        <div>
+            <label for="size">Rozmiar planszy</label>
+            <input type="number" name="size" value="8" min="4" step="1" id="size">
+        </div>
+        <div>
+            <label for="starting_rows">Liczba rzędów pionków</label>
+            <input type="number" class="form-control" name="starting_rows" access="false" value="3" min="1" step="1" id="starting_rows">
+        </div>
+        <div>
+            <label for="starting_player" class="formbuilder-radio-group-label">Rozpoczynający gracz</label>
+            <div>
+                <input name="starting_player" access="false" id="starting_player_white" value="white" type="radio" checked="checked">
+                <label for="starting_player_white">Biały</label>
+            </div>
+            <div>
+                <input name="starting_player" access="false" id="starting_player_black" value="black" type="radio">
+                <label for="starting_player_black">Czarny</label>
+            </div>
+        </div>
+    </div>
+    <input type="submit" value="Nowa gra"> 
+</form>
+
+{% endblock main %}
