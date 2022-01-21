@@ -14,19 +14,20 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path, include
+from django.urls import path
 from local import views
 from django.conf import settings
 from django.conf.urls.static import static
-from local.views import local
-from local.views import game
 
 urlpatterns = [
-    path('', views.local, name="local"),
-    # path('online/', include('online.urls')), # <- TODO: Target
+    path('', views.home, name="home"),
+    path('local/', views.local_main, name="local_main"),
+    path('local/new/', views.local_new, name="local_new"),
+    path('local/play/', views.local_game, name="local_game"),
+    path('online/', views.online_main, name="online_main"),
+    path('online/list/', views.online_list, name="online_list"),
+    path('online/new', views.online_new, name="online_new"),
+    path('online/room/<str:room_id>/lobby', views.online_lobby, name="online_lobby"),
+    path('online/room/<str:room_id>/play', views.online_game, name="online_game"),
     path('admin/', admin.site.urls),
-    path('', local),
-    path('play/<room_code>', game),
-    path('new/', views.new),
-    path('play/', views.local)
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
