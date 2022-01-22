@@ -1,5 +1,8 @@
 {% extends 'warcaby/base.html' %}
 {% block main %}
+{% load static %}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+<script src="{% static 'warcaby/cookies.js' %}"></script>
     <div class="topnav">
     <h1> Warcaby </h1>
     </div>
@@ -7,4 +10,8 @@
         <li><a href="local">Gra lokalna</a></li>
         <li><a href="online">Gra online</a></li>
     </ul>
+<div id="cookies">
+    Ta strona korzysta z plików cookie. Proszę zaakceptuj ich użycie <a class="cookiesOK">Akceptuj</a>
+</div>
+
 {% endblock main %}

@@ -18,3 +18,24 @@ form{
   margin:5px;
     padding:5px;
 }
+
+#cookies {
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: yellow;
+  font-size: small;
+  line-height: 20px;
+  padding: 8px 0 8px 30px;
+  position: fixed;
+  
+}
+
+#cookies a.cookiesOK {
+  background-color: #ffe310;
+  display: inline-block;
+  border-radius: 5px;
+  padding: 0 20px;
+  cursor: pointer;
+  margin: 0 60px 0 10px;
+}
