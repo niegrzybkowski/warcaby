@@ -11,4 +11,10 @@ html, body{
 
 h1 {
   margin-left: 20px;
+  font-size: xx-large;
+}
+
+form{
+  margin:5px;
+    padding:5px;
 }
