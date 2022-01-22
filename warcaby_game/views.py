@@ -108,7 +108,8 @@ def online_lobby(req: HttpRequest, room_id):
             
             return render(
                 req, "warcaby/online/lobby.html",
-                room | control
+                #room | control
+            room.update(control)
             )
     return redirect("/online/list", error="game_not_found")
     
