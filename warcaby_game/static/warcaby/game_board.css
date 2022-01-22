@@ -1,3 +1,8 @@
+.game_board_container{
+    margin:5px;
+    padding:5px;
+}
+
 table, th, td {
     border: 1px solid black;
     border-collapse:collapse;

@@ -2,11 +2,14 @@
 {% block head %}
     {% load static %}
     <link rel="stylesheet" type="text/css" href={% static 'warcaby/game_board.css' %}>
+    <link rel="stylesheet" type="text/css" href={% static 'warcaby/base.css' %}>
     {{ config | json_script:"board_configuration" }}
     <script src={% static 'warcaby/game.js'%}></script>
 {% endblock head %}
 
 {% block main %}
+<div class="topnav">
     <h1>Warcaby Statyczne</h1>
-    <div id="game_board_container"></div>
+</div>
+    <div class="game_board_container" id="game_board_container"></div>
 {% endblock main %}
