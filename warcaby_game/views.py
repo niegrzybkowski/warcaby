@@ -32,7 +32,11 @@ def local_game(req: HttpRequest):
         if key in req.GET: # TODO: GET is temporary, change to POST once config site is ready
             config[key] = req.GET[key]
     
-    config |= IMMUTABLE_BOARD_CONFIG
+    #config |= IMMUTABLE_BOARD_CONFIG
+
+    config = config.copy()
+    config.update(IMMUTABLE_BOARD_CONFIG)
+
     return HttpResponse(render(
         req, 
         "warcaby/local/game.html", 
