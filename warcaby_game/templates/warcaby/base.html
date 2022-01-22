@@ -5,7 +5,10 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=600px, height=600px, initial-scale=1.0">
     <title>Warcaby</title>
-    {% block head %} {% endblock head %}
+    {% block head %}
+     {% load static %}
+    <link rel="stylesheet" type="text/css" href={% static 'warcaby/base.css' %}>
+    {% endblock head %}
 </head>
 <body>
     <div id="main">

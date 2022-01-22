@@ -1,0 +1,14 @@
+.topnav {
+  background-color: #2596be;
+  overflow: hidden;
+}
+
+html, body{
+    margin:0px;
+    padding:0px;
+    background-color: #eeeee4;
+}
+
+h1 {
+  margin-left: 20px;
+}
