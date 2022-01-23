@@ -40,3 +40,14 @@ form{
   cursor: pointer;
   margin: 0 60px 0 10px;
 }
+
+
+.error{
+	display: none;
+	margin-left: 15px;
+}		
+
+.show_error{
+	color: red;
+	margin-left: 15px;
+}

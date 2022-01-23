@@ -1,8 +1,9 @@
 {% extends 'warcaby/base.html' %}
 
 {% block main %}
-<!--{% load static %}
-<script src="{% static 'warcaby/config.js' %}"></script> -->
+{% load static %}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+<script src="{% static 'warcaby/config.js' %}"></script> 
 <div class="topnav">
 <h1> Konfiguracja </h1>
 </div>
@@ -10,11 +11,13 @@
     <div class="config-form">
         <div>
             <label for="size">Rozmiar planszy</label>
-            <input type="number" name="size" value="8" min="4" step="1" id="c">
+            <input type="number" name="size" value="8" id="size">
+            <span id="error1" class="error">Romiar musi być liczbą naturalną większą równą 4</span> 
         </div>
         <div>
             <label for="starting_rows">Liczba rzędów pionków</label>
-            <input type="number" class="form-control" name="starting_rows" access="false" value="3" min="1" step="1" id="starting_rows">
+            <input type="number" class="form-control" name="starting_rows" access="false" value="3" id="starting_rows">
+            <span id="error2" class="error">Liczba rzędów pionków musi być liczbą naturalną większą równą 2</span> 
         </div>
         <div>
             <label for="starting_player" class="formbuilder-radio-group-label">Rozpoczynający gracz</label>
@@ -28,7 +31,8 @@
             </div>
         </div>
     </div>
-    <input type="submit" value="Nowa gra"> 
+    <input type="submit" value="Nowa gra">
+    <span id="error3" class="error">Rozmiar planszy jest za mały, w stosunku do liczby rzędów pionków</span> 
 </form>
 
 {% endblock main %}
