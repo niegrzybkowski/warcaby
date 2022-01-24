@@ -7,12 +7,14 @@
 {% endblock head %}
 
 {% block main %}
-<h1> Poczekalnia pokoju {{room.room_name}}</h1>
+<div class="topnav">
+<h1> Poczekalnia pokoju {{room_name}}</h1>
+</div>
 <span class="player_controlling"> 
-    {% if control == "white" %} 
-        Grasz białymi 
-    {% elif control == "black" %}
-        Grasz czarnymi 
+    {% if controlling == "white" %} 
+        Grasz białymi
+    {% elif controlling == "black" %}
+        Grasz czarnymi
     {% else %}
         Nie grasz
     {% endif %}
