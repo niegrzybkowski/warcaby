@@ -8,8 +8,10 @@
     {{ room.room_name | json_script:"room_name" }}
     <script src={% static 'warcaby/game.js'%}></script>
 {% endblock head %}
-
+{% block navbar %}
+<h1>Warcaby Online: {{room.room_name}} </h1>
+{% endblock navbar %}
 {% block main %}
-    <h1>Warcaby Online: {{room.room_name}} </h1>
+
     <div id="game_board_container"></div>
 {% endblock main %}

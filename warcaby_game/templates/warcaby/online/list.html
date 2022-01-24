@@ -1,8 +1,9 @@
 {% extends 'warcaby/base.html' %}
-{% block main %}
-<div class="topnav">
+{% block navbar %}
 <h1> Warcaby lista gier</h1>
-</div>
+{% endblock navbar %}
+{% block main %}
+
 <ul>
     {% for game in game_list %}
     {# TODO: Tabelka pewnie ładniej by wyglądała #}

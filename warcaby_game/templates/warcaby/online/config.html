@@ -1,12 +1,12 @@
 {% extends 'warcaby/base.html' %}
-
-{% block main %}
 {% load static %}
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
-<script src="{% static 'warcaby/config.js' %}"></script> 
-<div class="topnav">
+<script src="{% static 'warcaby/config.js' %}"></script>
+{% block navbar %}
 <h1> Konfiguracja </h1>
-</div>
+{% endblock navbar %}
+{% block main %}
+
 <form action="/online/create/" method="POST" onsubmit="return validateForm(event)">
     <div class="config-form">
         <div>

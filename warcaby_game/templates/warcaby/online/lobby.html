@@ -5,11 +5,10 @@
 {{ control | json_script:"control" }}
 <script src={% static 'warcaby/lobby.js'%}></script>
 {% endblock head %}
-
-{% block main %}
-<div class="topnav">
+{% block navbar %}
 <h1> Poczekalnia pokoju {{room_name}}</h1>
-</div>
+{% endblock navbar %}
+{% block main %}
 <span class="player_controlling"> 
     {% if controlling == "white" %} 
         Grasz białymi

@@ -7,10 +7,11 @@
     {{ online_config | json_script:"online_configuration" }}
     <script src={% static 'warcaby/game.js'%}></script>
 {% endblock head %}
+{% block navbar %}
+    <h1>Warcaby Statyczne</h1>
+{% endblock navbar %}
 
 {% block main %}
-<div class="topnav">
-    <h1>Warcaby Statyczne</h1>
-</div>
+
     <div class="game_board_container" id="game_board_container"></div>
 {% endblock main %}
