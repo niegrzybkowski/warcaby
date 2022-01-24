@@ -1,11 +1,13 @@
 {% extends 'warcaby/base.html' %}
 {% block main %}
+<div class="topnav">
 <h1> Poczekalnia pokoju {{room_name}}</h1>
+</div>
 <span class="player_controlling"> 
     {% if controlling == "white" %} 
-        Grasz białymi 
+        Grasz białymi
     {% elif controlling == "black" %}
-        Grasz czarnymi 
+        Grasz czarnymi
     {% else %}
         Nie grasz
     {% endif %}
