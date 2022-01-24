@@ -85,7 +85,9 @@ def online_create(req: HttpRequest):
 
         if GameRoom.objects.filter(pk = room_name).exclude(game_state = 'O').exists():
             raise Exception("exists")
-        GameRoom.objects.get(pk = room_name).delete()
+        
+        if GameRoom.objects.filter(pk = room_name).exists():
+            GameRoom.objects.get(pk = room_name).delete()
 
         fields = {}
         white_pawn = {
