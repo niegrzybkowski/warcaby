@@ -5,6 +5,14 @@ let turns = new Array;
 
 window.onload = function() {
     let board_configuration = JSON.parse(document.getElementById("board_configuration").textContent);
+    let online_configuration = JSON.parse(document.getElementById("online_configuration").textContent);
+    board_configuration["controllable_sides"] = online_configuration["controllable_sides"];
+    
+    let socket_address = null;
+    try {
+        let room_name = JSON.parse(document.getElementById("room_name").textContent);
+        socket_address ='ws://' + window.location.host + '/ws/game/' + room_name + '/';
+    } catch (ignore) {}
 
     bs = new PersistentBoardState(
         board_configuration
@@ -19,7 +27,8 @@ window.onload = function() {
     bc = new BoardController(
         bs,
         es,
-        br
+        br,
+        socket_address // connector
     );    
     bc.reload();
 }
@@ -685,12 +694,11 @@ class Turn {
         return turn;
     }
 
-    static from_JSON (serialized_turn) {
+    static from_JSON (turn_data) {
         let turn = new Turn;
-        let turn_data = JSON.parse(serialized_turn);
         turn.color = turn_data.color;
         turn.actions = new Array;
-        for (action of turn_data.actions) {
+        for (let action of turn_data.actions) {
             let parsed_action;
             if (action.type == "move") {
                 parsed_action = new MoveAction(action.from, action.to);
@@ -748,6 +756,7 @@ class TurnManager {
         for (let action of turn.actions) {
             action.apply(this.persistent_board_state);
         }
+        this.persistent_board_state.switch_current_move();
     }
 
     init_turn () {
@@ -787,12 +796,14 @@ class TurnManager {
 
     is_action_combination_valid (actions) {
         let first_action_type = actions[0].type;
-        for (let action of actions){
-            if (action.type != first_action_type) {
-                return false;
+        if (first_action_type == "kill") {
+            for (let action of actions){
+                if (action.type != first_action_type) {
+                    return false;
+                }
             }
         }
-        return true;
+        return actions.length;
     }
 
     is_all_actions_valid (actions) {
@@ -824,7 +835,98 @@ class TurnManager {
     restore_state () {
         this.persistent_board_state.load_state(this.start_of_turn_state);
     }
+
+    load_remote_state (state_data_object) {
+        let serialized_state = JSON.stringify(state_data_object);
+        this.persistent_board_state.load_state(serialized_state);
+    }
 }
+
+class SocketConnector {
+    socket_address;
+    socket;
+    turn_manager;
+    action_callback;
+
+    constructor (socket_address, turn_manager, action_callback) {
+        this.socket_address = socket_address;
+        this.socket = new WebSocket(this.socket_address);
+        this.socket.onclose = this.retry_connect.bind(this);
+        this.socket.onerror = this.retry_connect.bind(this);
+        this.socket.onmessage = this.handle_message.bind(this);
+        this.turn_manager = turn_manager;
+        this.action_callback = action_callback;
+    }
+
+    retry_connect () {
+        console.error('Chat socket closed unexpectedly, reloading site');
+        // console.log(this);
+        setTimeout(() => {location.reload()}, 5000);
+    }
+
+    handle_message (event) {
+        let message = JSON.parse(event.data);
+        console.log(message);
+        if (message["type"] == "turn") {
+            try {
+                let turn = Turn.from_JSON(message["data"]);
+                this.handle_turn(turn);
+            } catch (e) {
+                console.log(e)
+                console.error("Recieved malformed turn, requesting state")
+                this.send_request_state();
+            }
+        } 
+        else if (message["type"] == "state") {
+            this.handle_state(message["data"]);
+        } 
+        else if (message["type"] == "invalid_turn"){
+            console.error("Server-side validation failed, requesting state")
+            this.send_request_state();
+        }
+        else if (message["type"] == "game_over") {
+            this.handle_game_over(message["data"]["winner"])
+        }
+        this.action_callback(); 
+    }
+
+    handle_turn (turn) {
+        if (this.turn_manager.is_turn_valid(turn)) {
+            this.turn_manager.apply_turn(turn);
+        }
+        else  {
+            console.error("Recieved invalid turn, requesting state")
+            this.send_request_state();
+        }
+
+    }
+
+    handle_state (state) {
+        this.turn_manager.load_remote_state(state);
+    }
+
+    handle_game_over (winner) {
+        this.turn_manager.persistent_board_state.winner = winner;
+    }
+
+    send_request_state () {
+        this.send_message({
+            "type": "request_state"
+        });
+    }
+
+    send_turn (turn) {
+        this.send_message({
+            "type": "turn",
+            "data": turn
+        });
+    }
+
+    send_message (message) {
+        this.socket.send(JSON.stringify(message));
+    }
+}
+
 
 class BoardController {
     /**
@@ -836,13 +938,26 @@ class BoardController {
     /** @type {BoardRenderer} */ board_renderer;
     /** @type {MoveFinder} */ move_finder;
     /** @type {TurnManager} */ turn_manager;
+    /** @type {SocketConnector} */ socket_connector;
+    /** @type {boolean} */ is_local;
 
-    constructor (persistent_board_state, ephemeral_board_state, board_renderer) {
+    constructor (persistent_board_state, ephemeral_board_state, board_renderer, socket_address) {
         this.persistent_board_state = persistent_board_state;
         this.ephemeral_board_state = ephemeral_board_state;
         this.board_renderer = board_renderer;
         this.move_finder = new MoveFinder(persistent_board_state, ephemeral_board_state);
         this.turn_manager = new TurnManager(persistent_board_state);
+        if (socket_address) {
+            this.socket_connector = new SocketConnector(
+                socket_address,
+                this.turn_manager,
+                this.recieve_online_action.bind(this)
+            );
+            this.is_local = false;
+        }
+        else {
+            this.is_local = true;
+        }
     }
 
     reload () {
@@ -999,11 +1114,31 @@ class BoardController {
     }
 
     end_turn () {
-        turns.push(this.turn_manager.pending_turn); //temp
+        if (this.is_local) {
+            this.end_local_turn();
+        }
+        else {
+            this.end_online_turn();
+        }
+    }
+
+    end_local_turn () {
+        turns.push(this.turn_manager.pending_turn);
         this.persistent_board_state.switch_current_move();
         this.ephemeral_board_state.clear();
         
         this.queen_promotion_check();
         this.victory_check();
+    }
+
+    end_online_turn () {
+        this.ephemeral_board_state.clear();
+        this.turn_manager.restore_state();
+        this.socket_connector.send_turn(this.turn_manager.pending_turn);   
+    }
+
+    recieve_online_action () {
+        this.queen_promotion_check();
+        this.reload();
     }
 }

@@ -3,7 +3,8 @@
     {% load static %}
     <link rel="stylesheet" type="text/css" href={% static 'warcaby/game_board.css' %}>
     <link rel="stylesheet" type="text/css" href={% static 'warcaby/base.css' %}>
-    {{ config | json_script:"board_configuration" }}
+    {{ board_config | json_script:"board_configuration" }}
+    {{ online_config | json_script:"online_configuration" }}
     <script src={% static 'warcaby/game.js'%}></script>
 {% endblock head %}
 

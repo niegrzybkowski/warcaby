@@ -26,8 +26,9 @@ urlpatterns = [
     path('local/play/', views.local_game, name="local_game"),
     path('online/', views.online_main, name="online_main"),
     path('online/list/', views.online_list, name="online_list"),
-    path('online/new', views.online_new, name="online_new"),
-    path('online/room/<str:room_id>/lobby', views.online_lobby, name="online_lobby"),
-    path('online/room/<str:room_id>/play', views.online_game, name="online_game"),
+    path('online/new/', views.online_new, name="online_new"),
+    path('online/create/', views.online_create, name="online_create"),
+    path('online/room/<str:room_name>/lobby/', views.online_lobby, name="online_lobby"),
+    path('online/room/<str:room_name>/play/', views.online_game, name="online_game"),
     path('admin/', admin.site.urls),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

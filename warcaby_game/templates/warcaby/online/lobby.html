@@ -1,10 +1,17 @@
 {% extends 'warcaby/base.html' %}
+{% block head %}
+{% load static %}
+{{ room.room_name | json_script:"room_name" }}
+{{ control | json_script:"control" }}
+<script src={% static 'warcaby/lobby.js'%}></script>
+{% endblock head %}
+
 {% block main %}
-<h1> Poczekalnia pokoju {{room_name}}</h1>
+<h1> Poczekalnia pokoju {{room.room_name}}</h1>
 <span class="player_controlling"> 
-    {% if controlling == "white" %} 
+    {% if control == "white" %} 
         Grasz białymi 
-    {% elif controlling == "black" %}
+    {% elif control == "black" %}
         Grasz czarnymi 
     {% else %}
         Nie grasz
@@ -14,7 +21,7 @@
     <li>Gracz biały: <span class="not_ready" id="white_ready">Nie gotowy</span></li>
     <li>Gracz czarny: <span class="not_ready" id="black_ready">Nie gotowy</span></li>
 </ul>
-<input type="button" id="readiness" value="Gotowy" onclick="ready_up()">
+<input type="button" id="readiness" value="Gotowy">
 <span class="countdown" id="countdown"> </span>
 {% endblock main %}
 

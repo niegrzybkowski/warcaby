@@ -3,11 +3,13 @@
 {% block head %}
     {% load static %}
     <link rel="stylesheet" type="text/css" href={% static 'warcaby/game_board.css' %}>
-    {{ config | json_script:"board_configuration" }}
+    {{ board_config | json_script:"board_configuration" }}
+    {{ online_config | json_script:"online_configuration" }}
+    {{ room.room_name | json_script:"room_name" }}
     <script src={% static 'warcaby/game.js'%}></script>
 {% endblock head %}
 
 {% block main %}
-    <h1>Warcaby Online: {{room_name}} </h1>
+    <h1>Warcaby Online: {{room.room_name}} </h1>
     <div id="game_board_container"></div>
 {% endblock main %}
