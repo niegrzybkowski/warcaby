@@ -306,10 +306,10 @@ class BoardRenderer {
      */
     render () {
         this.clear();
-        this.render_info();
+        
         this.render_table();
         this.render_ephemeral();
-
+        this.render_info();
         console.log("Done Rendering");
     }
 
