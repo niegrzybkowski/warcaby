@@ -113,7 +113,7 @@ th, td {
 
 .game_board_container{
 display: grid;
-        grid-template-columns: 20% 80%;
+        grid-template-columns: 400px 100px;
         grid-template-rows: 50px;
         grid-column-gap: 150px;
         justify-items: left;
