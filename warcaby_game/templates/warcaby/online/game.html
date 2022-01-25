@@ -9,7 +9,7 @@
     <script src={% static 'warcaby/game.js'%}></script>
 {% endblock head %}
 {% block navbar %}
-<h1> <a class="bar" style="text-decoration: none; color: inherit;" href="{% url 'home' %}">Warcaby</a> > <a class="bar" style="text-decoration: none; color: inherit;" href="{% url 'online_main' %}">online</a> > <a class="bar" style="text-decoration: none; color: inherit;" href="{% url 'online_list' %}">lista gier</a> > pokój: {{room.room_name}}</h1>
+<h1> <a class="bar" href="{% url 'home' %}">Warcaby</a> > <a class="bar" href="{% url 'online_main' %}">online</a> > <a class="bar" href="{% url 'online_list' %}">lista gier</a> > pokój: {{room.room_name}}</h1>
 {% endblock navbar %}
 {% block main %}
 

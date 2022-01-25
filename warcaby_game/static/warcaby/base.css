@@ -3,6 +3,12 @@
   overflow: hidden;
 }
 
+a.bar:visited, a.bar:link{
+ style=text-decoration: none;
+ text-decoration: none;
+ color: inherit;
+}
+
 html, body{
     margin:0px;
     padding:0px;
