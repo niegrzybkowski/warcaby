@@ -46,24 +46,23 @@ def local_game(req: HttpRequest):
 def online_main(req: HttpRequest):
     if "player_name" not in req.session:
         req.session["player_name"] = ''.join(random.choices(string.ascii_uppercase + string.digits, k=32))
-    print(req.session["player_name"])
     return render(req, "warcaby/online/main.html")
 
 def online_list(req):
     if "player_name" not in req.session:
-        redirect("/online", error="no_cookie")
+        return redirect("/online", error="no_cookie")
     game_list = {"game_list": GameRoom.objects.exclude(game_state='O').order_by("room_name")[:]}
     return render(req, "warcaby/online/list.html", game_list)
 
 
 def online_new(req):
     if "player_name" not in req.session:
-        redirect("online_main")
+        return redirect("online_main")
     return render(req, "warcaby/online/config.html")
 
 def online_create(req: HttpRequest):
     if "player_name" not in req.session:
-        redirect("online_main", error="no_cookie")
+        return redirect("online_main", error="no_cookie")
     try:
         player = req.session["player_name"]
         data = req.POST
@@ -140,7 +139,7 @@ def online_create(req: HttpRequest):
 
 def online_lobby(req: HttpRequest, room_name):
     if "player_name" not in req.session:
-        redirect("/online", error="no_cookie")
+        return redirect("/online", error="no_cookie")
     room = GameRoom.objects.get(pk=room_name)
     if room.game_state == 'P':
         return redirect("online_game", room_name=room_name)
@@ -170,7 +169,7 @@ def online_lobby(req: HttpRequest, room_name):
 
 def online_game(req, room_name):
     if "player_name" not in req.session:
-        redirect("/online", error="no_cookie")
+        return redirect("/online")
     room = GameRoom.objects.get(room_name=room_name)
     if room.game_state == 'L':
         return redirect("online_lobby", room_name=room_name)
