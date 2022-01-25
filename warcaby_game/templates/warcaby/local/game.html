@@ -8,7 +8,7 @@
     <script src={% static 'warcaby/game.js'%}></script>
 {% endblock head %}
 {% block navbar %}
-    <h1>Warcaby Statyczne</h1>
+<h1> <a class="bar" href="{% url 'home' %}">Warcaby</a> > <a class="bar" href="{% url 'local_main' %}">lokalne</a> > gra</h1>
 {% endblock navbar %}
 
 {% block main %}

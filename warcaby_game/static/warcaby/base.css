@@ -1,11 +1,6 @@
 .topnav {
   background-color: #2596be;
   overflow: hidden;
-  display: grid;
-        grid-template-columns: 400px 100px 100px;
-        grid-template-rows: 90px;
-        grid-column-gap: 5px;
-        align-items: center;
 }
 
 html, body{
