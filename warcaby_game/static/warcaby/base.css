@@ -111,3 +111,8 @@ li:not(:last-child) {
   padding: 5px;
   max-width: 100px;
 }
+
+.config-table td {
+  padding: 10px;
+  max-width: 200px 200px 500px;
+}
