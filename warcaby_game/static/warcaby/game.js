@@ -14,6 +14,8 @@ window.onbeforeunload = function () {
 
 window.onload = function() {
     let board_configuration = JSON.parse(document.getElementById("board_configuration").textContent);
+    board_configuration["size"] = board_configuration["size"] - 0;
+    board_configuration["starting_rows"] = board_configuration["starting_rows"] - 0;
     let online_configuration = JSON.parse(document.getElementById("online_configuration").textContent);
     board_configuration["controllable_sides"] = online_configuration["controllable_sides"];
     
