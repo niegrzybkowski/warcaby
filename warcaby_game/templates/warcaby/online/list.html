@@ -7,10 +7,10 @@
 <ul>
     {% for game in game_list %}
     {# TODO: Tabelka pewnie ładniej by wyglądała #}
-        <li> 
-            {{game.room_name}}, 
+        <li class="linklist">
+            {{game.room_name}}
             {% if game.is_protected %}PIN,{% else %}{% endif %}
-            <a href={{"/online/room/" | add:game.room_name | add:"/lobby"}}> JOIN</a>
+            <a class="joinbutton" href={{"/online/room/" | add:game.room_name | add:"/lobby"}}> DOŁĄCZ</a>
         </li>
     {% endfor %}
 </ul>
