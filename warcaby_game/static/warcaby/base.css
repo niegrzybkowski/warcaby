@@ -1,10 +1,10 @@
 .topnav {
   background-color: #2596be;
+  color: #eeeee4;
   overflow: hidden;
 }
 
 a.bar:visited, a.bar:link{
- text-decoration: none;
  color: inherit;
 }
 
