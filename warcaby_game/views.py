@@ -51,7 +51,14 @@ def online_main(req: HttpRequest):
 def online_list(req):
     if "player_name" not in req.session:
         return redirect("/online", error="no_cookie")
-    game_list = {"game_list": GameRoom.objects.exclude(game_state='O').order_by("room_name")[:]}
+    player = req.session["player_name"]
+    hosted_games = GameRoom.objects.exclude(game_state='O').filter(host_player=player).order_by("room_name")[:]
+    guest_games = GameRoom.objects.exclude(game_state='O').filter(guest_player=player).order_by("room_name")[:]
+    waiting_games = GameRoom.objects.exclude(game_state='O').filter(guest_player=None).order_by("room_name")[:]
+    game_list = {
+        "game_list": (hosted_games | guest_games | waiting_games), 
+        "player": player
+    }
     return render(req, "warcaby/online/list.html", game_list)
 
 
