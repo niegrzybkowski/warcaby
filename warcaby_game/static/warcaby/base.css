@@ -4,7 +4,6 @@
 }
 
 a.bar:visited, a.bar:link{
- style=text-decoration: none;
  text-decoration: none;
  color: inherit;
 }
