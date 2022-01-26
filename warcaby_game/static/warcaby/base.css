@@ -8,6 +8,21 @@ a.bar:visited, a.bar:link{
  color: inherit;
 }
 
+a.links:visited, a.links:link{
+  background-color: #2596be;
+  color: #eeeee4;
+  text-decoration: none;
+  display: inline-block;
+  border-radius: 5px;
+  padding: 0 20px;
+  cursor: pointer;
+  margin: 0 60px 0 10px;
+}
+
+.linklist{
+    list-style-type: none;
+}
+
 html, body{
     margin:0px;
     padding:0px;
