@@ -455,7 +455,9 @@ class BoardRenderer {
     render_winner () {
         let paragraph = document.createElement("p");
         paragraph.appendChild(document.createTextNode(
-            this.localizer.winner_announcement + this.persistent_board_state.winner + "!"
+            this.localizer.winner_announcement + 
+            this.localizer.translate_color(this.persistent_board_state.winner) +
+            "!"
         ));
         this.game_information.appendChild(paragraph);
     }
