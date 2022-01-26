@@ -106,3 +106,8 @@ li:not(:last-child) {
   font-size: large;
   font-weight: bold;
 }
+
+.game-list td {
+  padding: 5px;
+  max-width: 100px;
+}

@@ -3,16 +3,41 @@
 <h1> <a class="bar" href="{% url 'home' %}">Warcaby</a> > <a class="bar" href="{% url 'online_main' %}">online</a> > lista gier</h1>
 {% endblock navbar %}
 {% block main %}
-
-<ul>
+<h2> Lista gier <a class="joinbutton" href="/online/new"> Stwórz nowy pokój </a> </h2> 
+<table class="game-list">
+    <tr> 
+        <th>Nazwa gry</th>
+        <th>Rodzaj</th>
+        <th>Stan gry</th>
+        <th></th>
+    </tr>
     {% for game in game_list %}
     {# TODO: Tabelka pewnie ładniej by wyglądała #}
-        <li class="linklist">
-            {{game.room_name}}
-            {% if game.is_protected %}PIN,{% else %}{% endif %}
-            <a class="joinbutton" href={{"/online/room/" | add:game.room_name | add:"/lobby"}}> DOŁĄCZ</a>
-        </li>
+    <tr> 
+        <td>{{game.room_name}}</td>
+        <td>
+            {% if player == game.host_player %} 
+                Gospodarz 
+            {% elif player == game.guest_player%}
+                Gość
+            {% else %}
+                Otwarta gra
+            {% endif %}
+        </td> 
+        <td>
+            {% if game.game_state == 'L' %} 
+                W poczekalni
+            {% elif game.game_state == 'P' %}
+                W grze
+            {% else %}
+                Gra zakończona
+            {% endif %}
+        </td>
+        <td>
+        <a class="joinbutton" href={{"/online/room/" | add:game.room_name | add:"/lobby"}}> Dołącz</a>
+        </td>
+    </tr>
     {% endfor %}
-</ul>
+</table>
 {% endblock main %}
 
