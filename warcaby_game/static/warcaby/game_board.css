@@ -1,6 +1,9 @@
 .game_board_container{
     margin:5px;
     padding:5px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
 }
 
 table, th, td {
@@ -109,13 +112,4 @@ th, td {
   text-align: center;
 
   color: black;
-}
-
-.game_board_container{
-display: grid;
-        grid-template-columns: 400px 100px;
-        grid-template-rows: 50px;
-        grid-column-gap: 150px;
-        justify-items: left;
-
 }
