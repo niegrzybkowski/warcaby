@@ -10,30 +10,49 @@
 
 <form action="/local/play" method="GET" onsubmit="return validateForm(event)">
     <div class="config-form">
+        <table class="config-table">
+    <tr>
+        <th></th>
+        <th></th>
+        <th></th>
+    </tr>
+      <tr>
         <div>
-            <label for="size">Rozmiar planszy</label>
-            <input type="number" name="size" value="8" id="size">
-            <span id="error1" class="error">Romiar musi być liczbą naturalną większą równą 4</span> 
+            <td><label for="size">Rozmiar planszy</label></td>
+            <td><input type="number" name="size" value="8" id="size"></td>
+            <td><span id="error1" class="error">Romiar musi być liczbą naturalną większą równą 4</span> </td>
         </div>
+          </tr>
+            <tr>
         <div>
-            <label for="starting_rows">Liczba rzędów pionków</label>
-            <input type="number" class="form-control" name="starting_rows" access="false" value="3" id="starting_rows">
-            <span id="error2" class="error">Liczba rzędów pionków musi być liczbą naturalną większą równą 2</span> 
+            <td><label for="starting_rows">Liczba rzędów pionków</label></td>
+            <td><input type="number" class="form-control" name="starting_rows" access="false" value="3" id="starting_rows"></td>
+            <td><span id="error2" class="error">Liczba rzędów pionków musi być liczbą naturalną większą równą 2</span> </td>
         </div>
+            </tr>
+             <tr>
         <div>
-            <label for="starting_player" class="formbuilder-radio-group-label">Rozpoczynający gracz</label>
+            <td><label for="starting_player" class="formbuilder-radio-group-label">Rozpoczynający gracz</label></td>
             <div>
-                <input name="starting_player" access="false" id="starting_player_white" value="white" type="radio" checked="checked">
-                <label for="starting_player_white">Biały</label>
+                <td><input name="starting_player" access="false" id="starting_player_white" value="white" type="radio" checked="checked">
+                <label for="starting_player_white">Biały</label></td>
             </div>
+             </tr>
+             <tr>
+             <td></td>
             <div>
-                <input name="starting_player" access="false" id="starting_player_black" value="black" type="radio">
-                <label for="starting_player_black">Czarny</label>
+                <td><input name="starting_player" access="false" id="starting_player_black" value="black" type="radio">
+                <label for="starting_player_black">Czarny</label></td>
             </div>
         </div>
     </div>
-    <input type="submit" value="Nowa gra">
-    <span id="error3" class="error">Rozmiar planszy jest za mały, w stosunku do liczby rzędów pionków</span> 
+    </tr>
+    <tr>
+    <td></td>
+    <td><input type="submit" value="Nowa gra">
+    <span id="error3" class="error">Rozmiar planszy jest za mały, w stosunku do liczby rzędów pionków</span></td>
+    </tr>
+    </table>
 </form>
 
 {% endblock main %}
