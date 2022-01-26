@@ -3,6 +3,15 @@ let bc;
 let start_of_game;
 let turns = new Array;
 
+window.onbeforeunload = function () {
+    try {
+        JSON.parse(document.getElementById("room_name").textContent);
+    }
+    catch (e) {
+        return "Unsaved";
+    }
+}
+
 window.onload = function() {
     let board_configuration = JSON.parse(document.getElementById("board_configuration").textContent);
     let online_configuration = JSON.parse(document.getElementById("online_configuration").textContent);
@@ -22,7 +31,8 @@ window.onload = function() {
     let br = new BoardRenderer(
         bs,
         es,
-        document.getElementById("game_board_container")
+        document.getElementById("game_board_container"),
+        "pl"
     );
     bc = new BoardController(
         bs,
@@ -279,6 +289,80 @@ class EphemeralBoardState {
     }
 }
 
+class PolishLocalizer {
+    constructor() {}
+    current_configuration = "Konfiguracja gry:";
+    winner_announcement = "Zwycięzcą jest ";
+    move_announcement = "Ruch strony: ";
+    setting_name_localization = {
+        "size": "Rozmiar planszy",
+        "starting_rows": "Rzędy startowych pionków",
+        "starting_player": "Rozpoczynający gracz",
+        "controllable_sides": "Kontrolowane strony"
+    };
+    translate_setting_names (setting) {
+        return this.setting_name_localization[setting];
+    }
+    translate_color (color) {
+        if (color == "white") 
+            return "Biały";
+        if (color == "black")
+            return "Czarny";
+    }
+    translate_setting_values (value) {
+        if (Array.isArray(value)) {
+            let translated_array = new Array;
+            for (let v of value){
+                translated_array.push(
+                    this.translate_color(v)
+                );
+            }
+            return translated_array.join(", ");
+        }
+        if (typeof value == "number") {
+            return "" + value;
+        }
+        return this.translate_color(value);
+    }
+}
+
+class EnglishLocalizer {
+    constructor() {}
+    current_configuration = "Current configuration:";
+    winner_announcement = "The winner is ";
+    move_announcement = "Now moving: ";
+    setting_name_localization = {
+        "size": "Board size",
+        "starting_rows": "Starting rows of pawns",
+        "starting_player": "Starting player",
+        "controllable_sides": "Controlled sides"
+    };
+    translate_setting_names (setting) {
+        return this.setting_name_localization[setting];
+    }
+    translate_color (color) {
+        if (color == "white") 
+            return "White";
+        if (color == "black")
+            return "Black";
+    }
+    translate_setting_values (value) {
+        if (Array.isArray(value)) {
+            let translated_array = new Array;
+            for (let v of value){
+                translated_array.push(
+                    this.translate_color(v)
+                );
+            }
+            return translated_array.join(", ");
+        }
+        if (typeof value == "number") {
+            return "" + value;
+        }
+        return this.translate_color(value);
+    }
+}
+
 class BoardRenderer {
     /**
      * Render internal state in DOM
@@ -295,10 +379,16 @@ class BoardRenderer {
     /** @type {Object.<string, Node>} */ pawns = {};
     /** @type {Object<string, Node>} */ legal_move_indicators = {};
 
-    constructor(persistent_board_state, ephemeral_board_state, container) {
+    constructor(persistent_board_state, ephemeral_board_state, container, locale) {
         this.persistent_board_state = persistent_board_state;
         this.ephemeral_board_state = ephemeral_board_state;
         this.container = container;
+        if (locale == "pl") {
+            this.localizer = new PolishLocalizer;
+        }
+        else {
+            this.localizer = new EnglishLocalizer;
+        }
     }
 
     /**
@@ -340,14 +430,16 @@ class BoardRenderer {
     render_config () {
         let paragraph = document.createElement("p");
         paragraph.appendChild(document.createTextNode(
-            "Current configuration:"
+            this.localizer.current_configuration
         ));
 
         let settings_list = document.createElement("ul");
         for (let [setting, value] of Object.entries(this.persistent_board_state.configuration)) {
             let setting_item = document.createElement("li");
+            let translated_setting = this.localizer.translate_setting_names(setting);
+            let translated_value = this.localizer.translate_setting_values(value)
             setting_item.appendChild(document.createTextNode(
-                setting + ": " + value
+                translated_setting + ": " + translated_value
             ));
             settings_list.appendChild(setting_item);
         }
@@ -359,7 +451,7 @@ class BoardRenderer {
     render_winner () {
         let paragraph = document.createElement("p");
         paragraph.appendChild(document.createTextNode(
-            "The winner is " + this.persistent_board_state.winner + "!"
+            this.localizer.winner_announcement + this.persistent_board_state.winner + "!"
         ));
         this.game_information.appendChild(paragraph);
     }
@@ -367,7 +459,8 @@ class BoardRenderer {
     render_current_move () {
         let paragraph = document.createElement("p");
         paragraph.appendChild(document.createTextNode(
-            "Now moving: " + this.persistent_board_state.current_move
+            this.localizer.move_announcement + 
+            this.localizer.translate_color(this.persistent_board_state.current_move)
         ));
         this.game_information.appendChild(paragraph);
     }
