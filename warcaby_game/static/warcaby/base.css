@@ -30,6 +30,17 @@ a.joinbutton:visited, a.joinbutton:link{
   margin: 0 60px 0 20px;
 }
 
+input[type=submit] {
+  background-color: #2596be;
+  color: #eeeee4;
+  text-decoration: none;
+  display: inline-block;
+  border-radius: 5px;
+  padding: 10px 20px;
+  cursor: pointer;
+  margin: 0 60px 0 20px;
+}
+
 
 .linklist{
     list-style-type: none;
