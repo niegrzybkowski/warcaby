@@ -60,3 +60,22 @@ form{
 li:not(:last-child) {
     margin-bottom: 10px;
 }
+
+#main {
+  padding: 10px;
+}
+
+#config_container {
+  width: 300px;
+  min-width: 100px;
+  height: fit-content;
+  border: black;
+  border-style: solid;
+  border-width: 1px;
+  padding: 10px;
+}
+
+#winner_para {
+  font-size: large;
+  font-weight: bold;
+}
