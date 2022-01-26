@@ -415,6 +415,8 @@ class BoardRenderer {
 
     render_info () {
         let info_container = document.createElement("div");
+        info_container.setAttribute("class", "config-container");
+        info_container.setAttribute("id", "config_container");
         this.game_information = info_container;
         this.container.appendChild(info_container);
 
